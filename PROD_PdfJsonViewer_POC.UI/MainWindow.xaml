@@ -3,14 +3,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:PROD_PdfJsonViewer_POC.UI"
+        xmlns:local="clr-namespace:PROD_PdfJsonViewer_POC.UI" xmlns:viewmodel="clr-namespace:PROD_PdfJsonViewer_POC.UI.ViewModel"
         mc:Ignorable="d"
+        xmlns:vm="clr-namespace:PROD_PdfJsonViewer_POC.UI.ViewModel"
+        d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel, IsDesignTimeCreatable=True}"
         Title="MainWindow" Height="675" Width="1200">
     <Grid>
-        <ToolBar Height="34" VerticalAlignment="Top">
-            <Button x:Name="OpenFileButton" Content="Open File" Padding="10 0" HorizontalAlignment="Left"></Button>   
+        <ToolBar VerticalAlignment="Top">
+            <Button x:Name="OpenFileButton" Content="Open File" Padding="10 0" HorizontalAlignment="Left" Height="50" VerticalAlignment="Center" Command="{Binding OpenPdfFileCommand}"></Button>
         </ToolBar>
-        <WebBrowser x:Name="PdfViewer" Height="625" Width="600" HorizontalAlignment="Left" VerticalAlignment="Bottom"></WebBrowser>
-        <TreeView x:Name="JsonViewer" Height="625" Width="600" HorizontalAlignment="Right" VerticalAlignment="Bottom"></TreeView>
+        <WebBrowser x:Name="PdfViewer" Height="600" Width="600" HorizontalAlignment="Left" VerticalAlignment="Bottom" Source="{Binding SelectedPdfFile}"></WebBrowser>
+        <TreeView x:Name="JsonViewer" Height="600" Width="600" HorizontalAlignment="Right" VerticalAlignment="Bottom"></TreeView>
     </Grid>
 </Window>

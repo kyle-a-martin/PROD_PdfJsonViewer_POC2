@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using PROD_PdfJsonViewer_POC.UI.ViewModel;
 
 namespace PROD_PdfJsonViewer_POC.UI
 {
@@ -10,6 +11,7 @@ namespace PROD_PdfJsonViewer_POC.UI
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = new MainWindowViewModel();
         }
     }
 }
