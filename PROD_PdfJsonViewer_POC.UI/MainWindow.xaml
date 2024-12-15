@@ -3,16 +3,53 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:PROD_PdfJsonViewer_POC.UI" xmlns:viewmodel="clr-namespace:PROD_PdfJsonViewer_POC.UI.ViewModel"
+        xmlns:local="clr-namespace:PROD_PdfJsonViewer_POC.UI" 
+        xmlns:viewmodel="clr-namespace:PROD_PdfJsonViewer_POC.UI.ViewModel"
+        xmlns:helper="clr-namespace:PROD_PdfJsonViewer_POC.UI.Helper"
         mc:Ignorable="d"
         xmlns:vm="clr-namespace:PROD_PdfJsonViewer_POC.UI.ViewModel"
         d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel, IsDesignTimeCreatable=True}"
-        Title="MainWindow" Height="675" Width="1200">
-    <Grid>
-        <ToolBar VerticalAlignment="Top">
-            <Button x:Name="OpenFileButton" Content="Open File" Padding="10 0" HorizontalAlignment="Left" Height="50" VerticalAlignment="Center" Command="{Binding OpenPdfFileCommand}"></Button>
+        Title="MainWindow" Height="675" MinWidth="1200">
+    <Window.Resources>
+        <helper:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+    </Window.Resources>
+    <DockPanel>
+        <ToolBar DockPanel.Dock="Top" VerticalAlignment="Top" Grid.ColumnSpan="2">
+            <ToolBarPanel VerticalAlignment="Top" Orientation="Horizontal" Width="Auto">
+                <Button x:Name="OpenFileButton" Content="Open File" Padding="5 0"  Height="30"  Command="{Binding OpenPdfFileCommand}"></Button>
+                <TextBlock x:Name="FolderPath" Text="{Binding FolderPath}" Margin="10 0" Padding="5 0"  Height="30" Width="Auto" MaxWidth="200"></TextBlock>
+                <ComboBox x:Name="PdfFilesComboBox" ItemsSource="{Binding PdfFiles}" SelectedItem="{Binding SelectedPdfFile}" Width="200" Margin="10 0" Padding="5 0" Height="30"></ComboBox>
+                <Button x:Name="PreviousButton" Content="Previous" Padding="5 0"  Height="30"  Command="{Binding PreviousPdfCommand}" Margin="10 0"></Button>
+                <Button x:Name="NextButton" Content="Next" Padding="5 0"  Height="30"  Command="{Binding NextPdfCommand}" Margin="10 0"></Button>
+            </ToolBarPanel>
+            <ToolBarPanel>
+
+            </ToolBarPanel>
         </ToolBar>
-        <WebBrowser x:Name="PdfViewer" Height="600" Width="600" HorizontalAlignment="Left" VerticalAlignment="Bottom" Source="{Binding SelectedPdfFile}"></WebBrowser>
-        <TreeView x:Name="JsonViewer" Height="600" Width="600" HorizontalAlignment="Right" VerticalAlignment="Bottom"></TreeView>
-    </Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <ScrollViewer Grid.Column="0" Grid.Row="0">
+                <WebBrowser x:Name="PdfViewer"  MinHeight="600" MinWidth="600" HorizontalAlignment="Left" VerticalAlignment="Bottom"></WebBrowser>
+            </ScrollViewer>
+            <ScrollViewer Grid.Column="1" Grid.Row="0">
+                <TreeView x:Name="JsonViewer" ItemsSource="{Binding JsonTree}" Margin="0" Padding="10 5 10 5" HorizontalAlignment="Right" VerticalAlignment="Bottom" MinWidth="580" MinHeight="600">
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Name}" FontWeight="Bold" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Width="Auto"
+                                         Visibility="{Binding Value, Converter={StaticResource NullToVisibilityConverter}}"/>
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+            </ScrollViewer>
+        </Grid>
+    </DockPanel>
 </Window>

@@ -11,7 +11,7 @@ namespace PROD_PdfJsonViewer_POC.UI
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new MainWindowViewModel();
+            DataContext = new MainWindowViewModel(this);
         }
     }
 }

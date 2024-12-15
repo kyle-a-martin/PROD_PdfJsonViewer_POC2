@@ -5,14 +5,28 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Microsoft.Win32;
 using PROD_PdfJsonViewer_POC.UI.Helper;
+using System.Collections.ObjectModel;
+using System.Text.Json.Nodes;
+using PROD_PdfJsonViewer_POC.UI.Model;
 
 namespace PROD_PdfJsonViewer_POC.UI.ViewModel
 {
     internal class MainWindowViewModel : ViewModelBase
     {
         private string _selectedPdfFile;
+        private string _folderPath;
+
         private JsonDocument _jsonData;
-        private TreeView treeView;
+        private Uri _pdfSource;
+
+        private MainWindow _view;
+        private ObservableCollection<JsonTreeNode> _jsonTree= new ObservableCollection<JsonTreeNode>();
+
+        public ObservableCollection<string> PdfFiles { get; set; } = new ObservableCollection<string>(); // List of PDF files
+
+        public ICommand PreviousPdfCommand { get; }
+
+        public ICommand NextPdfCommand { get; }
 
         public string SelectedPdfFile
         {
@@ -20,10 +34,28 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
             set { SetProperty(ref _selectedPdfFile, value); }
         }
 
+        public string FolderPath
+        {
+            get { return _folderPath; }
+            set { SetProperty(ref _folderPath, value); }
+        }
+
         public JsonDocument JsonData
         {
             get { return _jsonData; }
             set { SetProperty(ref _jsonData, value); }
+        }
+
+        public ObservableCollection<JsonTreeNode> JsonTree
+        {
+            get { return _jsonTree; }
+            set { SetProperty(ref _jsonTree, value); }
+        }
+
+        public Uri PdfSource
+        {
+            get { return _pdfSource; }
+            set { SetProperty(ref _pdfSource, value); }
         }
 
         public ICommand OpenPdfFileCommand { get; }
@@ -33,6 +65,15 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
         {
             OpenPdfFileCommand = new RelayCommand(OpenPdfFile);
             LoadJsonDataCommand = new RelayCommand(LoadJsonData);
+            PreviousPdfCommand = new RelayCommand(PreviousPdf);
+            NextPdfCommand = new RelayCommand(NextPdf);
+        }
+
+        public MainWindowViewModel(MainWindow view)
+        {
+            OpenPdfFileCommand = new RelayCommand(OpenPdfFile);
+            LoadJsonDataCommand = new RelayCommand(LoadJsonData);
+            _view = view;
         }
 
         private void OpenPdfFile()
@@ -44,6 +85,7 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
             if (openFileDialog.ShowDialog() == true)
             {
                 _selectedPdfFile = openFileDialog.FileName;
+                FolderPath = Path.GetDirectoryName(_selectedPdfFile)??"File/Folder Not Found";
                 // Find the related JSON file
                 string jsonFile = GetRelatedJsonFile(_selectedPdfFile);
                 if (jsonFile != null)
@@ -51,12 +93,20 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
                     // Load the JSON data and apply it to the TreeView
                     LoadJsonData(jsonFile);
                 }
+
+                _pdfSource = new Uri(_selectedPdfFile);
+                _view.PdfViewer.Navigate(_pdfSource);
             }
         }
 
         private void LoadJsonData()
         {
-            // Load JSON data from selected PDF file
+            // Load the JSON data and apply it to the TreeView
+            string jsonFile = GetRelatedJsonFile(_selectedPdfFile);
+            if (jsonFile != null)
+            {
+                LoadJsonData(jsonFile);
+            }
         }
 
         private string GetRelatedJsonFile(string pdfFile)
@@ -75,10 +125,63 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
 
         private void LoadJsonData(string jsonFile)
         {
-            // Load JSON data from file
             string json = File.ReadAllText(jsonFile);
-            JsonDocument jsonData = JsonDocument.Parse(json);
-            treeView.ItemsSource = jsonData.RootElement.GetProperty("data").EnumerateArray();
+            var jsonNode = JsonNode.Parse(json);
+
+            JsonTree.Clear();
+
+            if (jsonNode != null)
+            {
+                var root = new JsonTreeNode { Name = "Root" };
+                AddJsonNodeToTree(jsonNode, root);
+                JsonTree.Add(root);
+            }
+        }
+
+        private void AddJsonNodeToTree(JsonNode jsonNode, JsonTreeNode parentNode)
+        {
+            switch (jsonNode)
+            {
+                case JsonObject jsonObject:
+                    foreach (var property in jsonObject)
+                    {
+                        var childNode = new JsonTreeNode { Name = property.Key, IsEditable = true };
+                        AddJsonNodeToTree(property.Value, childNode);
+                        parentNode.Children.Add(childNode);
+                    }
+                    break;
+
+                case JsonArray jsonArray:
+                    for (int i = 0; i < jsonArray.Count; i++)
+                    {
+                        var childNode = new JsonTreeNode { Name = $"[{i}]", IsEditable = true };
+                        AddJsonNodeToTree(jsonArray[i], childNode);
+                        parentNode.Children.Add(childNode);
+                    }
+                    break;
+
+                case JsonValue jsonValue:
+                    parentNode.Value = jsonValue.ToString();
+                    break;
+            }
+        }
+
+        private void PreviousPdf()
+        {
+            int currentIndex = PdfFiles.IndexOf(SelectedPdfFile);
+            if (currentIndex > 0)
+            {
+                SelectedPdfFile = PdfFiles[currentIndex - 1];
+            }
+        }
+
+        private void NextPdf()
+        {
+            int currentIndex = PdfFiles.IndexOf(SelectedPdfFile);
+            if (currentIndex < PdfFiles.Count - 1)
+            {
+                SelectedPdfFile = PdfFiles[currentIndex + 1];
+            }
         }
     }
 }
