@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         xmlns:vm="clr-namespace:PROD_PdfJsonViewer_POC.UI.ViewModel"
         d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel, IsDesignTimeCreatable=True}"
-        Title="MainWindow" Height="675" MinWidth="1200">
+        Title="DataBank - JSON Validator" Height="675" MinWidth="1200">
     <Window.Resources>
         <helper:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
     </Window.Resources>
@@ -28,11 +28,11 @@
         </ToolBar>
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="615*"></RowDefinition>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="580*"></ColumnDefinition>
+                <ColumnDefinition Width="580*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <ScrollViewer Grid.Column="0" Grid.Row="0">
                 <WebBrowser x:Name="PdfViewer"  MinHeight="600" MinWidth="600" HorizontalAlignment="Left" VerticalAlignment="Bottom"></WebBrowser>

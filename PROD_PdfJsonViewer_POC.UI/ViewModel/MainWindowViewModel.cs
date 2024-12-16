@@ -8,6 +8,7 @@ using PROD_PdfJsonViewer_POC.UI.Helper;
 using System.Collections.ObjectModel;
 using System.Text.Json.Nodes;
 using PROD_PdfJsonViewer_POC.UI.Model;
+using System.Windows.Data;
 
 namespace PROD_PdfJsonViewer_POC.UI.ViewModel
 {
@@ -31,13 +32,13 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
         public string SelectedPdfFile
         {
             get { return _selectedPdfFile; }
-            set { SetProperty(ref _selectedPdfFile, value); }
+            set { SetProperty(ref _selectedPdfFile, value); LoadPdfToViewer(); }
         }
 
         public string FolderPath
         {
             get { return _folderPath; }
-            set { SetProperty(ref _folderPath, value); }
+            set { SetProperty(ref _folderPath, value); LoadLocalPdfFiles(); }
         }
 
         public JsonDocument JsonData
@@ -74,6 +75,8 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
             OpenPdfFileCommand = new RelayCommand(OpenPdfFile);
             LoadJsonDataCommand = new RelayCommand(LoadJsonData);
             _view = view;
+            PreviousPdfCommand = new RelayCommand(PreviousPdf);
+            NextPdfCommand = new RelayCommand(NextPdf);
         }
 
         private void OpenPdfFile()
@@ -84,18 +87,34 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
             openFileDialog.Title = "Select a PDF file";
             if (openFileDialog.ShowDialog() == true)
             {
-                _selectedPdfFile = openFileDialog.FileName;
+                SelectedPdfFile = openFileDialog.FileName;
                 FolderPath = Path.GetDirectoryName(_selectedPdfFile)??"File/Folder Not Found";
-                // Find the related JSON file
-                string jsonFile = GetRelatedJsonFile(_selectedPdfFile);
-                if (jsonFile != null)
-                {
-                    // Load the JSON data and apply it to the TreeView
-                    LoadJsonData(jsonFile);
-                }
+            }
+        }
 
-                _pdfSource = new Uri(_selectedPdfFile);
-                _view.PdfViewer.Navigate(_pdfSource);
+        private void LoadPdfToViewer()
+        {
+            // Find the related JSON file
+            string jsonFile = GetRelatedJsonFile(_selectedPdfFile);
+            if (jsonFile != null)
+            {
+                // Load the JSON data and apply it to the TreeView
+                LoadJsonData(jsonFile);
+            }
+
+            _pdfSource = new Uri(_selectedPdfFile);
+            _view.PdfViewer.Navigate(_pdfSource);
+        }
+
+        private void LoadLocalPdfFiles()
+        {
+
+            // Load PDF files from local folder
+            string[] pdfFiles = Directory.GetFiles(FolderPath, "*.pdf");
+            PdfFiles.Clear();
+            foreach (string pdfFile in pdfFiles)
+            {
+                PdfFiles.Add(pdfFile);
             }
         }
 
@@ -132,7 +151,7 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
 
             if (jsonNode != null)
             {
-                var root = new JsonTreeNode { Name = "Root" };
+                var root = new JsonTreeNode { };
                 AddJsonNodeToTree(jsonNode, root);
                 JsonTree.Add(root);
             }
@@ -173,6 +192,10 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
             {
                 SelectedPdfFile = PdfFiles[currentIndex - 1];
             }
+            else
+            {
+                SelectedPdfFile = PdfFiles[PdfFiles.Count - 1];
+            }
         }
 
         private void NextPdf()
@@ -181,6 +204,10 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
             if (currentIndex < PdfFiles.Count - 1)
             {
                 SelectedPdfFile = PdfFiles[currentIndex + 1];
+            }
+            else
+            {
+                SelectedPdfFile = PdfFiles[0];
             }
         }
     }
