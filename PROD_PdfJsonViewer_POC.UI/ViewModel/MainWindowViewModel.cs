@@ -144,18 +144,25 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
 
         private void LoadJsonData(string jsonFile)
         {
+            // Load JSON data
             string json = File.ReadAllText(jsonFile);
-            var jsonNode = JsonNode.Parse(json);
-
-            JsonTree.Clear();
-
-            if (jsonNode != null)
-            {
-                var root = new JsonTreeNode { };
-                AddJsonNodeToTree(jsonNode, root);
-                JsonTree.Add(root);
-            }
+            JsonData = JsonDocument.Parse(json);
         }
+
+        //private void LoadJsonData(string jsonFile)
+        //{
+        //    string json = File.ReadAllText(jsonFile);
+        //    var jsonNode = JsonNode.Parse(json);
+
+        //    JsonTree.Clear();
+
+        //    if (jsonNode != null)
+        //    {
+        //        var root = new JsonTreeNode { };
+        //        AddJsonNodeToTree(jsonNode, root);
+        //        JsonTree.Add(root);
+        //    }
+        //}
 
         private void AddJsonNodeToTree(JsonNode jsonNode, JsonTreeNode parentNode)
         {

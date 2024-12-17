@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PROD_PdfJsonViewer_POC.UI" 
-        xmlns:viewmodel="clr-namespace:PROD_PdfJsonViewer_POC.UI.ViewModel"
         xmlns:helper="clr-namespace:PROD_PdfJsonViewer_POC.UI.Helper"
         mc:Ignorable="d"
         xmlns:vm="clr-namespace:PROD_PdfJsonViewer_POC.UI.ViewModel"
@@ -38,7 +37,7 @@
                 <WebBrowser x:Name="PdfViewer"  MinHeight="600" MinWidth="600" HorizontalAlignment="Left" VerticalAlignment="Bottom"></WebBrowser>
             </ScrollViewer>
             <ScrollViewer Grid.Column="1" Grid.Row="0">
-                <TreeView x:Name="JsonViewer" ItemsSource="{Binding JsonTree}" Margin="0" Padding="10 5 10 5" HorizontalAlignment="Right" VerticalAlignment="Bottom" MinWidth="580" MinHeight="600">
+                <!--<TreeView x:Name="JsonViewer" ItemsSource="{Binding JsonTree}" Margin="0" Padding="10 5 10 5" HorizontalAlignment="Right" VerticalAlignment="Bottom" MinWidth="580" MinHeight="600">
                     <TreeView.ItemTemplate>
                         <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                             <StackPanel Orientation="Horizontal">
@@ -48,7 +47,7 @@
                             </StackPanel>
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>
-                </TreeView>
+                </TreeView>-->
             </ScrollViewer>
         </Grid>
     </DockPanel>
