@@ -1,27 +1,25 @@
-﻿using System.Text.Json;
-using System.Windows;
-using System.IO;
-using System.Windows.Controls;
-using System.Windows.Input;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using PROD_PdfJsonViewer_POC.UI.Helper;
-using System.Collections.ObjectModel;
-using System.Text.Json.Nodes;
 using PROD_PdfJsonViewer_POC.UI.Model;
-using System.Windows.Data;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Windows.Input;
 
 namespace PROD_PdfJsonViewer_POC.UI.ViewModel
 {
     internal class MainWindowViewModel : ViewModelBase
     {
         private string _selectedPdfFile;
+        private string _relatedJsonFile;
         private string _folderPath;
 
         private JsonDocument _jsonData;
         private Uri _pdfSource;
 
         private MainWindow _view;
-        private ObservableCollection<JsonTreeNode> _jsonTree= new ObservableCollection<JsonTreeNode>();
+        private ObservableCollection<JsonTreeNode> _jsonTree = new ObservableCollection<JsonTreeNode>();
 
         public ObservableCollection<string> PdfFiles { get; set; } = new ObservableCollection<string>(); // List of PDF files
 
@@ -33,6 +31,12 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
         {
             get { return _selectedPdfFile; }
             set { SetProperty(ref _selectedPdfFile, value); LoadPdfToViewer(); }
+        }
+
+        public string RelatedJsonFile
+        {
+            get { return _relatedJsonFile; }
+            set { SetProperty(ref _relatedJsonFile, value); }
         }
 
         public string FolderPath
@@ -88,7 +92,7 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
             if (openFileDialog.ShowDialog() == true)
             {
                 SelectedPdfFile = openFileDialog.FileName;
-                FolderPath = Path.GetDirectoryName(_selectedPdfFile)??"File/Folder Not Found";
+                FolderPath = Path.GetDirectoryName(_selectedPdfFile) ?? "File/Folder Not Found";
             }
         }
 
@@ -99,7 +103,8 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
             if (jsonFile != null)
             {
                 // Load the JSON data and apply it to the TreeView
-                LoadJsonData(jsonFile);
+                //LoadJsonData(jsonFile);
+                RelatedJsonFile = jsonFile;
             }
 
             _pdfSource = new Uri(_selectedPdfFile);

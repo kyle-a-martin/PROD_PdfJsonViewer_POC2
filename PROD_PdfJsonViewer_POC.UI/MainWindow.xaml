@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PROD_PdfJsonViewer_POC.UI" 
+        xmlns:controls="clr-namespace:PROD_PdfJsonViewer_POC.UI.Controls"
         xmlns:helper="clr-namespace:PROD_PdfJsonViewer_POC.UI.Helper"
         mc:Ignorable="d"
         xmlns:vm="clr-namespace:PROD_PdfJsonViewer_POC.UI.ViewModel"
@@ -48,6 +49,9 @@
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>
                 </TreeView>-->
+
+                <controls:JsonEditorControl x:Name="JsonViewer" FilePath="{Binding RelatedJsonFile}" Margin="0" Padding="10 5 10 5" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="580" Height="600" MinWidth="580" MinHeight="600"></controls:JsonEditorControl>
+
             </ScrollViewer>
         </Grid>
     </DockPanel>

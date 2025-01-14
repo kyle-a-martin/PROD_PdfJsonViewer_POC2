@@ -1,5 +1,5 @@
-﻿using System.Windows;
-using PROD_PdfJsonViewer_POC.UI.ViewModel;
+﻿using PROD_PdfJsonViewer_POC.UI.ViewModel;
+using System.Windows;
 
 namespace PROD_PdfJsonViewer_POC.UI
 {
