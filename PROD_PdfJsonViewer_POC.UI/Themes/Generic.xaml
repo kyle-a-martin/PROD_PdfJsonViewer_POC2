@@ -3,9 +3,7 @@
                     xmlns:local="clr-namespace:PROD_PdfJsonViewer_POC.UI.Controls"
                     xmlns:helper="clr-namespace:PROD_PdfJsonViewer_POC.UI.Helper">
 
-    <helper:JsonValueConverter x:Key="JsonValueConverter"/>
-    <helper:JsonNodeTypeSelector x:Key="JsonNodeTypeSelector" />
-  
+    <helper:JsonValueConverter x:Key="JsonValueConverter"/>  
   
     <!-- Template for displaying JSON Arrays -->
     <DataTemplate x:Key="JsonArrayTemplate">
@@ -19,7 +17,7 @@
                         Padding="5">
                         <ContentPresenter 
                             Content="{Binding}" 
-                            ContentTemplateSelector="{StaticResource JsonNodeTypeSelector}"/>
+                        />
                     </Border>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
@@ -43,7 +41,7 @@
                                 Margin="0,0,10,0"/>
                             <ContentPresenter 
                                 Content="{Binding Value}" 
-                                ContentTemplateSelector="{StaticResource JsonNodeTypeSelector}"/>
+                            />
                         </StackPanel>
                     </Border>
                 </DataTemplate>
@@ -77,37 +75,24 @@
         </TextBox>
     </DataTemplate>
 
-  <!-- Selector for displaying JSON nodes -->
-  <helper:JsonNodeTypeSelector x:Key="JsonNodeTypeSelector"
-                              JsonArrayTemplate="{StaticResource JsonArrayTemplate}"
-                              JsonObjectTemplate="{StaticResource JsonObjectTemplate}"
-                              JsonValueTemplate="{StaticResource JsonValueTemplate}"
-                              />
-
     <!-- Main template for any JSON node -->
     <DataTemplate x:Key="JsonNodeTemplate">
-        <ContentControl Content="{Binding}">
-            <ContentControl.Style>
-                <Style TargetType="ContentControl">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding GetType}" Value="JsonArray">
-                            <Setter Property="ContentTemplate" 
-                                    Value="{StaticResource JsonArrayTemplate}"/>
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding GetType}" Value="JsonObject">
-                            <Setter Property="ContentTemplate" 
-                                    Value="{StaticResource JsonObjectTemplate}"/>
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding GetType}" Value="JsonValue">
-                            <Setter Property="ContentTemplate" 
-                                    Value="{StaticResource JsonValueTemplate}"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </ContentControl.Style>
-        </ContentControl>
+        <ContentControl Content="{Binding}"/>
     </DataTemplate>
 
+    <!-- Selector for displaying JSON nodes -->
+    <helper:JsonNodeTypeSelector x:Key="JsonNodeTypeSelector"
+                                JsonArrayTemplate="{StaticResource JsonArrayTemplate}"
+                                JsonObjectTemplate="{StaticResource JsonObjectTemplate}"
+                                JsonValueTemplate="{StaticResource JsonValueTemplate}"
+                                JsonNodeTemplate="{StaticResource JsonArrayTemplate}"
+                                />
+
+  <!-- Define a Style that uses the DataTemplateSelector -->
+  <Style x:Key="JsonNodeStyle" TargetType="ContentPresenter">
+    <Setter Property="ContentTemplateSelector" Value="{StaticResource JsonNodeTypeSelector}" />
+  </Style>
+  
     <!-- Main Control Template -->
     <ControlTemplate x:Key="JsonEditorControlTemplate" TargetType="local:JsonEditorControl">
         <Border BorderBrush="Gray" BorderThickness="1" Padding="10">
@@ -117,7 +102,7 @@
                     Text="JSON Editor"
                     Margin="0,0,0,10"
                     FontSize="16"
-                    Foreground="Red"
+                    Foreground="Black"
                     FontWeight="Bold"/>
                 
                 <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,10">
@@ -142,7 +127,7 @@
                     <ContentPresenter 
                         x:Name="PART_ContentPresenter"
                         Content="{Binding JsonContent, RelativeSource={RelativeSource TemplatedParent}, Mode=OneWay}"
-                        ContentTemplateSelector="{StaticResource JsonNodeTypeSelector}"/>
+                        Style="{StaticResource JsonNodeStyle}"/>
                 </ScrollViewer>
             </DockPanel>
         </Border>

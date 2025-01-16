@@ -50,7 +50,7 @@
                     </TreeView.ItemTemplate>
                 </TreeView>-->
 
-                <controls:JsonEditorControl x:Name="JsonViewer" FilePath="{Binding RelatedJsonFile}" Margin="0" Padding="10 5 10 5" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="580" Height="600" MinWidth="580" MinHeight="600"></controls:JsonEditorControl>
+                <controls:JsonEditorControl x:Name="JsonViewer" IsEditing="True" FilePath="{Binding RelatedJsonFile}" Margin="0" Padding="10 5 10 5" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="Auto" Height="Auto" MinWidth="580" MinHeight="600"></controls:JsonEditorControl>
 
             </ScrollViewer>
         </Grid>

@@ -35,7 +35,7 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
     ///     <MyNamespace:JsonEditor/>
     ///
     /// </summary>
-    public class JsonEditorControl : Control
+    public class JsonEditorControl : System.Windows.Controls.Control
     {
         static JsonEditorControl()
         {
@@ -122,7 +122,7 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
 
                 // Update content and notify
                 UpdateContent(newContent);
-                
+
             }
             catch (Exception ex)
             {

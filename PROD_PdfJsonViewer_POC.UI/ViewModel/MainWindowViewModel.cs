@@ -143,7 +143,7 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
             }
             else
             {
-                return null;
+                return String.Empty;
             }
         }
 
