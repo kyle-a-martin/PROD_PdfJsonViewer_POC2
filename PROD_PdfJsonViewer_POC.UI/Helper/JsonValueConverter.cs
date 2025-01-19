@@ -37,7 +37,7 @@ namespace PROD_PdfJsonViewer_POC.UI.Helper
             {
                 try
                 {
-                    return JsonValue.Parse(strValue);
+                    return JsonNode.Parse(strValue);
                 }
                 catch
                 {

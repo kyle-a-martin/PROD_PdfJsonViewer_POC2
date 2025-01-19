@@ -1,41 +1,15 @@
 ﻿using PROD_PdfJsonViewer_POC.UI.Helper;
+using System;
+using System.Diagnostics;
 using System.IO;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace PROD_PdfJsonViewer_POC.UI.Controls
 {
-    /// <summary>
-    /// Follow steps 1a or 1b and then 2 to use this custom control in a XAML file.
-    ///
-    /// Step 1a) Using this custom control in a XAML file that exists in the current project.
-    /// Add this XmlNamespace attribute to the root element of the markup file where it is 
-    /// to be used:
-    ///
-    ///     xmlns:MyNamespace="clr-namespace:PROD_PdfJsonViewer_POC.UI.Controls"
-    ///
-    ///
-    /// Step 1b) Using this custom control in a XAML file that exists in a different project.
-    /// Add this XmlNamespace attribute to the root element of the markup file where it is 
-    /// to be used:
-    ///
-    ///     xmlns:MyNamespace="clr-namespace:PROD_PdfJsonViewer_POC.UI.Controls;assembly=PROD_PdfJsonViewer_POC.UI.Controls"
-    ///
-    /// You will also need to add a project reference from the project where the XAML file lives
-    /// to this project and Rebuild to avoid compilation errors:
-    ///
-    ///     Right click on the target project in the Solution Explorer and
-    ///     "Add Reference"->"Projects"->[Browse to and select this project]
-    ///
-    ///
-    /// Step 2)
-    /// Go ahead and use your control in the XAML file.
-    ///
-    ///     <MyNamespace:JsonEditor/>
-    ///
-    /// </summary>
-    public class JsonEditorControl : System.Windows.Controls.Control
+    public class JsonEditorControl : Control
     {
         static JsonEditorControl()
         {
@@ -44,7 +18,44 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
                 new FrameworkPropertyMetadata(typeof(JsonEditorControl)));
         }
 
-        // Dependency Properties for external configuration
+        // 1. Define a read-only dependency property "JsonContent"
+        //    We provide a "key" for internal use, plus the public DP.
+        private static readonly DependencyPropertyKey JsonContentPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(JsonContent),
+                typeof(JsonNode),
+                typeof(JsonEditorControl),
+                new PropertyMetadata(default(JsonNode), OnJsonContentChanged));
+
+        public static readonly DependencyProperty JsonContentProperty =
+            JsonContentPropertyKey.DependencyProperty;
+
+        /// <summary>
+        /// A read-only DP for the JSON content of the control.
+        /// </summary>
+        public JsonNode JsonContent
+        {
+            get => (JsonNode)GetValue(JsonContentProperty);
+            // No public setter, because it's read-only.
+        }
+
+        private static void OnJsonContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            // This method is called whenever the control's JsonContent changes.
+            // You could place debugging or additional logic here if needed.
+            // For example:
+            //
+            var control = (JsonEditorControl)d;
+            var oldValue = (JsonNode)e.OldValue;
+            var newValue = (JsonNode)e.NewValue;
+
+             Debug.WriteLine($"JsonContent changed from {oldValue} to {newValue}");
+             Debug.WriteLine($"IsEditing: {control.IsEditing}");
+             Debug.WriteLine($"FilePath: {control.FilePath}");
+             
+        }
+
+        // 2. Public dependency properties for FilePath, IsEditing, etc.
         public static readonly DependencyProperty FilePathProperty =
             DependencyProperty.Register(
                 nameof(FilePath),
@@ -59,10 +70,7 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
                 typeof(JsonEditorControl),
                 new PropertyMetadata(false));
 
-        // Internal state for JSON content
-        private JsonNode _jsonContent;
-
-        // Public properties
+        // 3. Public getters/setters for FilePath, IsEditing
         public string FilePath
         {
             get => (string)GetValue(FilePathProperty);
@@ -71,12 +79,11 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
 
         private static void FilePathPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var control = d as JsonEditorControl;
-            if (control != null)
+            if (d is JsonEditorControl control)
             {
-                string? newFilePath = e.NewValue as string;
-                string? oldFilePath = e.OldValue as string;
-                if (newFilePath != oldFilePath)
+                var newFilePath = e.NewValue as string;
+                var oldFilePath = e.OldValue as string;
+                if (!string.Equals(newFilePath, oldFilePath, StringComparison.OrdinalIgnoreCase))
                 {
                     control.LoadJson();
                 }
@@ -89,13 +96,10 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
             set => SetValue(IsEditingProperty, value);
         }
 
-        // Read-only access to JSON content if needed
-        public JsonNode JsonContent => _jsonContent;
-
-        // Event to notify of content changes
+        // 4. Event to notify external code if needed
         public event EventHandler ContentChanged;
 
-        // Commands for button actions
+        // 5. Commands (if you want to keep them)
         public RelayCommand LoadCommand { get; }
         public RelayCommand SaveCommand { get; }
         public RelayCommand ToggleEditCommand { get; }
@@ -122,7 +126,6 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
 
                 // Update content and notify
                 UpdateContent(newContent);
-
             }
             catch (Exception ex)
             {
@@ -134,11 +137,15 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
         {
             try
             {
-                if (_jsonContent == null || string.IsNullOrWhiteSpace(FilePath))
+                // If there's no content or FilePath is invalid, do nothing
+                if (JsonContent is null || string.IsNullOrWhiteSpace(FilePath))
                     return;
 
-                var options = new System.Text.Json.JsonSerializerOptions { WriteIndented = true };
-                string jsonString = _jsonContent.ToJsonString(options);
+                // Convert JsonNode back to a string
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                string jsonString = JsonContent.ToJsonString(options);
+
+                // Write to file
                 File.WriteAllText(FilePath, jsonString);
                 MessageBox.Show("JSON saved successfully!");
             }
@@ -148,26 +155,18 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
             }
         }
 
-        private bool CanSaveJson() => _jsonContent != null;
+        private bool CanSaveJson() => JsonContent != null;
 
         private void ToggleEdit() => IsEditing = !IsEditing;
 
-        // Helper method to update content and raise change notification
+        
         private void UpdateContent(JsonNode newContent)
         {
-            _jsonContent = newContent;
-            ContentChanged?.Invoke(this, EventArgs.Empty);
+            // SetValue(...) is how we update a read-only DP from inside the control.
+            SetValue(JsonContentPropertyKey, newContent);
 
-            // Force a refresh of the visual tree
-            var template = Template;
-            if (template != null)
-            {
-                var contentPresenter = template.FindName("PART_ContentPresenter", this) as ContentPresenter;
-                if (contentPresenter != null)
-                {
-                    contentPresenter.Content = _jsonContent;
-                }
-            }
+            // If you still want to raise your custom event, do it here
+            ContentChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 }

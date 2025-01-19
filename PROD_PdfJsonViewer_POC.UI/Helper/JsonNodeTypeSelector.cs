@@ -9,7 +9,6 @@ namespace PROD_PdfJsonViewer_POC.UI.Helper
         public DataTemplate JsonObjectTemplate { get; set; }
         public DataTemplate JsonArrayTemplate { get; set; }
         public DataTemplate JsonValueTemplate { get; set; }
-        public DataTemplate JsonNodeTemplate { get; set; }
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
