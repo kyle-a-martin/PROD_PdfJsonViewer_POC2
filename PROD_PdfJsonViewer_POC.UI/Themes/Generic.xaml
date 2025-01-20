@@ -16,11 +16,11 @@
     -->
 
     <!-- Template for displaying JSON Arrays -->
-    <DataTemplate x:Key="JsonArrayTemplate">
-        <!-- 
+    <!--<DataTemplate x:Key="JsonArrayTemplate">
+        --><!-- 
             Because JsonArray implements IEnumerable<JsonNode>, 
             we can directly bind to it. 
-        -->
+        --><!--
         <ItemsControl ItemsSource="{Binding}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
@@ -28,24 +28,24 @@
                             BorderBrush="LightGray"
                             BorderThickness="0,0,0,1"
                             Padding="5">
-                        <!-- 
+                        --><!-- 
                             Each item is a JsonNode. We dispatch it to the 
                             JsonNodeTypeSelector directly here.
-                        -->
+                        --><!--
                         <ContentPresenter
                             Content="{Binding}"
-                            ContentTemplateSelector="{DynamicResource JsonNodeTypeSelector}" />
+                            ContentTemplateSelector="{DynamicResource JsonNodeSelector}" />
                     </Border>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-    </DataTemplate>
+    </DataTemplate>-->
 
     <!-- Template for displaying JSON Objects -->
-    <DataTemplate x:Key="JsonObjectTemplate">
-        <!-- 
+    <!--<DataTemplate x:Key="JsonObjectTemplate">
+        --><!-- 
             JsonObject implements IEnumerable<KeyValuePair<string, JsonNode>>. 
-        -->
+        --><!--
         <ItemsControl ItemsSource="{Binding}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
@@ -58,22 +58,22 @@
                                 Text="{Binding Key}"
                                 FontWeight="Bold"
                                 Margin="0,0,10,0"/>
-                            <!-- 
+                            --><!-- 
                                 The Value is the actual JsonNode; 
                                 again use the selector. 
-                            -->
+                            --><!--
                             <ContentPresenter
                                 Content="{Binding Value}"
-                                ContentTemplateSelector="{DynamicResource JsonNodeTypeSelector}" />
+                                ContentTemplateSelector="{DynamicResource JsonNodeSelector}" />
                         </StackPanel>
                     </Border>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-    </DataTemplate>
+    </DataTemplate>-->
 
     <!-- Template for displaying JSON Values -->
-    <DataTemplate x:Key="JsonValueTemplate">
+    <!--<DataTemplate x:Key="JsonValueTemplate">
         <TextBox
             Text="{Binding Converter={StaticResource JsonValueConverter},
                            Mode=TwoWay,
@@ -85,7 +85,7 @@
             IsReadOnly="{Binding IsEditing,
                                 RelativeSource={RelativeSource AncestorType=local:JsonEditorControl}}">
 
-            <!-- Optional styling/triggers can go here -->
+            --><!-- Optional styling/triggers can go here --><!--
             <TextBox.Style>
                 <Style TargetType="TextBox">
                     <Style.Triggers>
@@ -100,16 +100,16 @@
             </TextBox.Style>
 
         </TextBox>
-    </DataTemplate>
+    </DataTemplate>-->
 
     <!-- 
         3) The JsonNodeTypeSelector that references those three templates 
         with static resources
     -->
-    <helper:JsonNodeTypeSelector x:Key="JsonNodeTypeSelector"
+    <!--<helper:JsonNodeTypeSelector x:Key="JsonNodeSelector"
                                  JsonObjectTemplate="{StaticResource JsonObjectTemplate}"
                                  JsonArrayTemplate="{StaticResource JsonArrayTemplate}"
-                                 JsonValueTemplate="{StaticResource JsonValueTemplate}" />
+                                 JsonValueTemplate="{StaticResource JsonValueTemplate}" />-->
 
     <!-- 
         4) Main Control Template for the custom JsonEditorControl. 
@@ -129,6 +129,7 @@
                 -->
                 <StackPanel DockPanel.Dock="Top"
                             Orientation="Horizontal"
+                            HorizontalAlignment="Stretch"
                             Margin="0,0,0,10">
                     <TextBox
                         Text="{Binding FilePath, RelativeSource={RelativeSource TemplatedParent}}"
@@ -159,7 +160,7 @@
                     <ContentPresenter
                         Margin="10"
                         Content="{TemplateBinding JsonContent}"
-                        ContentTemplateSelector="{StaticResource JsonNodeTypeSelector}" />
+                        ContentTemplateSelector="{StaticResource JsonNodeSelector}" />
                 </ScrollViewer>
 
             </DockPanel>
