@@ -3,8 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:PROD_PdfJsonViewer_POC.UI.Controls"
-    xmlns:helper="clr-namespace:PROD_PdfJsonViewer_POC.UI.Helper"
-    xmlns:fa="http://schemas.fontawesome.io/icons/">
+    xmlns:helper="clr-namespace:PROD_PdfJsonViewer_POC.UI.Helper">
 
     <!-- 1) Converter(s) -->
     <helper:JsonValueConverter x:Key="JsonValueConverter"/>
@@ -63,9 +62,9 @@
     <!-- Template for displaying JSON Values -->
     <DataTemplate x:Key="JsonValueTemplate">
         <TextBox 
-            Text="{Binding Converter={StaticResource JsonValueConverter}, 
+            Text="{Binding AsValue.ToString(), Converter={StaticResource JsonValueConverter}, 
                    Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-            IsReadOnly="{Binding IsEditing, 
+            IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBooleanConverter}, 
                         RelativeSource={RelativeSource AncestorType=local:JsonEditorControl}}"
             TextWrapping="Wrap"
             AcceptsReturn="True"
@@ -107,36 +106,41 @@
                 Padding="10">
             <DockPanel>
 
+                <!-- Example Header -->
+                <TextBlock 
+                    Text="JSON Editor"
+                    Margin="0,0,0,10"
+                    FontSize="16"
+                    FontWeight="Bold"
+                    DockPanel.Dock="Top"/>
+
                 <!-- Controls to enter file path, load, toggle edit, and save -->
                 <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,10">
                     <TextBox 
                         Text="{Binding FilePath, RelativeSource={RelativeSource TemplatedParent}}"
                         Width="300" 
-                        Margin="0,0,10,0"
-                        Style="{DynamicResource ModernTextBox}"/>
+                        Margin="0,0,10,0"/>
                     <Button 
-                        fa:Awesome.Content="Upload" 
-                        TextElement.FontFamily="pack://application:,,,/FontAwesome.WPF;component/#FontAwesome"
+                        Content="Load"
                         Command="{Binding LoadCommand, RelativeSource={RelativeSource TemplatedParent}}"
-                        Margin="0,0,10,0"
-                        Style="{DynamicResource SquareIconButton}"/>
+                        Margin="0,0,10,0"/>
                     <Button 
-                        fa:Awesome.Content="Edit" 
-                        TextElement.FontFamily="pack://application:,,,/FontAwesome.WPF;component/#FontAwesome"
+                        Content="Toggle Edit"
                         Command="{Binding ToggleEditCommand, RelativeSource={RelativeSource TemplatedParent}}"
-                        Margin="0,0,10,0"
-                        Style="{DynamicResource SquareIconButton}"/>
+                        Margin="0,0,10,0"/>
                     <Button 
-                        fa:Awesome.Content="Save" 
-                        TextElement.FontFamily="pack://application:,,,/FontAwesome.WPF;component/#FontAwesome"
-                        Command="{Binding SaveCommand, RelativeSource={RelativeSource TemplatedParent}}"
-                        Style="{DynamicResource SquareIconButton}"/>
+                        Content="Save"
+                        Command="{Binding SaveCommand, RelativeSource={RelativeSource TemplatedParent}}"/>
                 </StackPanel>
 
                 <!-- Scrollable region to display the JSON content -->
                 <ScrollViewer>
                     <!-- Use the same style for the top-level ContentPresenter -->
-                    <StackPanel Name="MainStackPanel" Margin="10" IsEnabled="True" />
+                    <ContentPresenter 
+                        x:Name="PART_ContentPresenter"
+                        Content="{Binding JsonContent, RelativeSource={RelativeSource TemplatedParent}, Mode=OneWay}"
+                        Style="{DynamicResource JsonNodeStyle}"
+                        />
                 </ScrollViewer>
             </DockPanel>
         </Border>

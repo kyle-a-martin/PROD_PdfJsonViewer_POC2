@@ -5,7 +5,7 @@ namespace PROD_PdfJsonViewer_POC.TestConsole
     internal class Program
     {
         static char Spacer = '*';
-        
+
         static void Main(string[] args)
         {
             Console.WriteLine("JSON Editor Test Console");
@@ -34,23 +34,24 @@ namespace PROD_PdfJsonViewer_POC.TestConsole
         {
             foreach (var kvp in jsonObject)
             {
-                
+
                 if (kvp.Value is JsonObject nestedObject)
                 {
                     Console.WriteLine($"{new string(Spacer, indent)}{kvp.Key}: ");
                     IterateJsonObject(nestedObject, indent + 4);
-                }else if (kvp.Value is JsonArray nestedArray)
+                }
+                else if (kvp.Value is JsonArray nestedArray)
                 {
                     IterateJsonArray(nestedArray, indent + 4);
                 }
                 else if (kvp.Value is JsonValue nestedValue)
-                {   
+                {
                     PrintJsonValue(kvp.Key, nestedValue, indent);
                 }
             }
         }
 
-        static void IterateJsonArray(JsonArray jsonArray , int indent = 0) 
+        static void IterateJsonArray(JsonArray jsonArray, int indent = 0)
         {
             foreach (var item in jsonArray)
             {
@@ -75,7 +76,7 @@ namespace PROD_PdfJsonViewer_POC.TestConsole
             Console.WriteLine($"{new string(Spacer, indent)}{key}");
         }
 
-        static void PrintJsonValue( JsonValue jsonValue, int indent = 0)
+        static void PrintJsonValue(JsonValue jsonValue, int indent = 0)
         {
             Console.WriteLine(jsonValue.ToString());
         }

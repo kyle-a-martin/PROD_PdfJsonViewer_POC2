@@ -4,6 +4,15 @@
              xmlns:local="clr-namespace:PROD_PdfJsonViewer_POC.UI"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles/Buttons.xaml" />
+                <ResourceDictionary Source="Styles/ComboBoxes.xaml" />  
+                <ResourceDictionary Source="Styles/TextBoxes.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>
+
+    
+    
