@@ -24,10 +24,10 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
         {
             base.OnApplyTemplate();
 
-            _mainStackPanel = (StackPanel)GetTemplateChild("MainStackPanel");
+            //_mainStackPanel = (StackPanel)GetTemplateChild("MainStackPanel");
 
-            if (_mainStackPanel is null)
-                throw new InvalidOperationException("Could not find MainStackPanel in template.");
+            //if (_mainStackPanel is null)
+            //    throw new InvalidOperationException("Could not find MainStackPanel in template.");
         }
 
         // 1. Define a read-only dependency property "JsonContent"
@@ -183,8 +183,8 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
             // If you still want to raise your custom event, do it here
             ContentChanged?.Invoke(this, EventArgs.Empty);
 
-            _mainStackPanel.Children.Clear();
-            PopulateStackPanel(newContent, _mainStackPanel);
+            //_mainStackPanel.Children.Clear();
+            //PopulateStackPanel(newContent, _mainStackPanel);
         }
 
         private void PopulateStackPanel(JsonNode jsonNode, Panel parentPanel, int level = 0)
