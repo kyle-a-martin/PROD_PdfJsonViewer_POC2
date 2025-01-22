@@ -47,7 +47,9 @@
                             <TextBlock
                             Text="{Binding Key}"
                             FontWeight="Bold"
-                            Margin="0,0,10,0"/>
+                            Margin="0,0,10,0"
+                            VerticalAlignment="Center"
+                            Height="Auto"/>
                             <!-- 
                             The Value is the actual JsonNode; 
                             again use the selector. 
@@ -92,7 +94,7 @@
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsEditing,
                                                   RelativeSource={RelativeSource AncestorType=local:JsonEditorControl}}"
-                                 Value="False">
+                                 Value="True">
                             <Setter Property="Background" Value="Transparent"/>
                             <Setter Property="BorderThickness" Value="0"/>
                         </DataTrigger>

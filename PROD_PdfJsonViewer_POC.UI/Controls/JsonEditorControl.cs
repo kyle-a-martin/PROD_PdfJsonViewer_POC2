@@ -11,69 +11,36 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
 {
     public class JsonEditorControl : Control
     {
+        #region Fields and Properties
+
         private StackPanel _mainStackPanel;
 
-        static JsonEditorControl()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(
-                typeof(JsonEditorControl),
-                new FrameworkPropertyMetadata(typeof(JsonEditorControl)));
-        }
-
-        public override void OnApplyTemplate()
-        {
-            base.OnApplyTemplate();
-
-            //_mainStackPanel = (StackPanel)GetTemplateChild("MainStackPanel");
-
-            //if (_mainStackPanel is null)
-            //    throw new InvalidOperationException("Could not find MainStackPanel in template.");
-        }
-
-        // 1. Define a read-only dependency property "JsonContent"
-        //    We provide a "key" for internal use, plus the public DP.
-        private static readonly DependencyPropertyKey JsonContentPropertyKey =
+        public static readonly DependencyPropertyKey JsonContentPropertyKey =
             DependencyProperty.RegisterReadOnly(
                 nameof(JsonContent),
                 typeof(JsonNode),
                 typeof(JsonEditorControl),
                 new PropertyMetadata(default(JsonNode), OnJsonContentChanged));
 
-        public static readonly DependencyProperty JsonContentProperty =
-            JsonContentPropertyKey.DependencyProperty;
+        public static readonly DependencyProperty JsonContentProperty = JsonContentPropertyKey.DependencyProperty;
 
-        /// <summary>
-        /// A read-only DP for the JSON content of the control.
-        /// </summary>
         public JsonNode JsonContent
         {
             get => (JsonNode)GetValue(JsonContentProperty);
-            // No public setter, because it's read-only.
         }
 
-        private static void OnJsonContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            // This method is called whenever the control's JsonContent changes.
-            // You could place debugging or additional logic here if needed.
-            // For example:
-            //
-            var control = (JsonEditorControl)d;
-            var oldValue = (JsonNode)e.OldValue;
-            var newValue = (JsonNode)e.NewValue;
-
-            Debug.WriteLine($"JsonContent changed from {oldValue} to {newValue}");
-            Debug.WriteLine($"IsEditing: {control.IsEditing}");
-            Debug.WriteLine($"FilePath: {control.FilePath}");
-
-        }
-
-        // 2. Public dependency properties for FilePath, IsEditing, etc.
         public static readonly DependencyProperty FilePathProperty =
             DependencyProperty.Register(
                 nameof(FilePath),
                 typeof(string),
                 typeof(JsonEditorControl),
-                new PropertyMetadata(string.Empty, FilePathPropertyChanged));
+                new PropertyMetadata(string.Empty, OnFilePathPropertyChanged));
+
+        public string FilePath
+        {
+            get => (string)GetValue(FilePathProperty);
+            set => SetValue(FilePathProperty, value);
+        }
 
         public static readonly DependencyProperty IsEditingProperty =
             DependencyProperty.Register(
@@ -82,14 +49,55 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
                 typeof(JsonEditorControl),
                 new PropertyMetadata(false));
 
-        // 3. Public getters/setters for FilePath, IsEditing
-        public string FilePath
+        public bool IsEditing
         {
-            get => (string)GetValue(FilePathProperty);
-            set => SetValue(FilePathProperty, value);
+            get => (bool)GetValue(IsEditingProperty);
+            set => SetValue(IsEditingProperty, value);
         }
 
-        private static void FilePathPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        #endregion
+
+        #region Constructors and Initialization
+
+        static JsonEditorControl()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(
+                typeof(JsonEditorControl),
+                new FrameworkPropertyMetadata(typeof(JsonEditorControl)));
+        }
+
+        public JsonEditorControl()
+        {
+            LoadCommand = new RelayCommand(LoadJson);
+            SaveCommand = new RelayCommand(SaveJson, CanSaveJson);
+            ToggleEditCommand = new RelayCommand(ToggleEdit);
+        }
+
+        #endregion
+
+        #region Commands
+
+        public RelayCommand LoadCommand { get; }
+        public RelayCommand SaveCommand { get; }
+        public RelayCommand ToggleEditCommand { get; }
+
+        #endregion
+
+        #region Event Handlers
+
+        public event EventHandler ContentChanged;
+        private static void OnJsonContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = (JsonEditorControl)d;
+            var oldValue = (JsonNode)e.OldValue;
+            var newValue = (JsonNode)e.NewValue;
+
+            Debug.WriteLine($"JsonContent changed from {oldValue} to {newValue}");
+            Debug.WriteLine($"IsEditing: {control.IsEditing}");
+            Debug.WriteLine($"FilePath: {control.FilePath}");
+        }
+
+        private static void OnFilePathPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is JsonEditorControl control)
             {
@@ -102,25 +110,18 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
             }
         }
 
-        public bool IsEditing
+        #endregion
+
+        #region Methods
+
+        public override void OnApplyTemplate()
         {
-            get => (bool)GetValue(IsEditingProperty);
-            set => SetValue(IsEditingProperty, value);
-        }
+            base.OnApplyTemplate();
 
-        // 4. Event to notify external code if needed
-        public event EventHandler ContentChanged;
+            //_mainStackPanel = (StackPanel)GetTemplateChild("MainStackPanel");
 
-        // 5. Commands (if you want to keep them)
-        public RelayCommand LoadCommand { get; }
-        public RelayCommand SaveCommand { get; }
-        public RelayCommand ToggleEditCommand { get; }
-
-        public JsonEditorControl()
-        {
-            LoadCommand = new RelayCommand(LoadJson);
-            SaveCommand = new RelayCommand(SaveJson, CanSaveJson);
-            ToggleEditCommand = new RelayCommand(ToggleEdit);
+            //if (_mainStackPanel is null)
+            //    throw new InvalidOperationException("Could not find MainStackPanel in template.");
         }
 
         private void LoadJson()
@@ -139,7 +140,9 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
                     var newContent = JsonNode.Parse(jsonString);
 
                     // Update content and notify
-                    UpdateContent(newContent);
+                    //UpdateContent(newContent);
+
+                    SetValue(JsonContentPropertyKey, newContent);
                 }
             }
             catch (Exception ex)
@@ -155,13 +158,17 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
                 // If there's no content or FilePath is invalid, do nothing
                 if (JsonContent is null || string.IsNullOrWhiteSpace(FilePath))
                     return;
+                Debug.WriteLine($"Save JSON File...");
+                Debug.WriteLine($"FilePath: {FilePath}");
 
                 // Convert JsonNode back to a string
                 var options = new JsonSerializerOptions { WriteIndented = true };
                 string jsonString = JsonContent.ToJsonString(options);
 
+                var content = ((JsonNode)GetValue(JsonContentProperty)).ToJsonString(options);
+
                 // Write to file
-                File.WriteAllText(FilePath, jsonString);
+                File.WriteAllText(FilePath, content);
                 MessageBox.Show("JSON saved successfully!");
             }
             catch (Exception ex)
@@ -173,7 +180,6 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
         private bool CanSaveJson() => JsonContent != null;
 
         private void ToggleEdit() => IsEditing = !IsEditing;
-
 
         private void UpdateContent(JsonNode newContent)
         {
@@ -257,11 +263,11 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
                 }
                 else
                 {
-                    var textBlock = new TextBlock 
+                    var textBlock = new TextBlock
                     {
-                        Text = item.ToString(), 
-                        Background = System.Windows.Media.Brushes.White, 
-                        Margin = new Thickness(5, 5, 5, 5), 
+                        Text = item.ToString(),
+                        Background = System.Windows.Media.Brushes.White,
+                        Margin = new Thickness(5, 5, 5, 5),
                         VerticalAlignment = VerticalAlignment.Center,
                         Style = (Style)FindResource("ExpandingTextBox")
                     };
@@ -303,5 +309,7 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
 
             return grid;
         }
+
+        #endregion
     }
 }

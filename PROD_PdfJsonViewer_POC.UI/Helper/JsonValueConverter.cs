@@ -17,7 +17,7 @@ namespace PROD_PdfJsonViewer_POC.UI.Helper
         {
             if (value is JsonValue jsonValue)
             {
-                return jsonValue.ToJsonString();
+                return jsonValue.ToString();
             }
             return string.Empty;
         }
