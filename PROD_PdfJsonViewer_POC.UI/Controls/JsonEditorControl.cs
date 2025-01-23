@@ -15,18 +15,17 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
 
         private StackPanel _mainStackPanel;
 
-        public static readonly DependencyPropertyKey JsonContentPropertyKey =
-            DependencyProperty.RegisterReadOnly(
+        public static readonly DependencyProperty JsonContentProperty =
+            DependencyProperty.Register(
                 nameof(JsonContent),
                 typeof(JsonNode),
                 typeof(JsonEditorControl),
-                new PropertyMetadata(default(JsonNode), OnJsonContentChanged));
-
-        public static readonly DependencyProperty JsonContentProperty = JsonContentPropertyKey.DependencyProperty;
+                new FrameworkPropertyMetadata(default(JsonNode), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnJsonContentChanged));
 
         public JsonNode JsonContent
         {
             get => (JsonNode)GetValue(JsonContentProperty);
+            set => SetValue(JsonContentProperty, value);
         }
 
         public static readonly DependencyProperty FilePathProperty =
@@ -95,6 +94,8 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
             Debug.WriteLine($"JsonContent changed from {oldValue} to {newValue}");
             Debug.WriteLine($"IsEditing: {control.IsEditing}");
             Debug.WriteLine($"FilePath: {control.FilePath}");
+
+            control.ContentChanged?.Invoke(control, EventArgs.Empty);
         }
 
         private static void OnFilePathPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -140,9 +141,7 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
                     var newContent = JsonNode.Parse(jsonString);
 
                     // Update content and notify
-                    //UpdateContent(newContent);
-
-                    SetValue(JsonContentPropertyKey, newContent);
+                    JsonContent = newContent;
                 }
             }
             catch (Exception ex)
@@ -165,10 +164,8 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
                 var options = new JsonSerializerOptions { WriteIndented = true };
                 string jsonString = JsonContent.ToJsonString(options);
 
-                var content = ((JsonNode)GetValue(JsonContentProperty)).ToJsonString(options);
-
                 // Write to file
-                File.WriteAllText(FilePath, content);
+                File.WriteAllText(FilePath, jsonString);
                 MessageBox.Show("JSON saved successfully!");
             }
             catch (Exception ex)
@@ -180,135 +177,6 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
         private bool CanSaveJson() => JsonContent != null;
 
         private void ToggleEdit() => IsEditing = !IsEditing;
-
-        private void UpdateContent(JsonNode newContent)
-        {
-            // SetValue(...) is how we update a read-only DP from inside the control.
-            SetValue(JsonContentPropertyKey, newContent);
-
-            // If you still want to raise your custom event, do it here
-            ContentChanged?.Invoke(this, EventArgs.Empty);
-
-            //_mainStackPanel.Children.Clear();
-            //PopulateStackPanel(newContent, _mainStackPanel);
-        }
-
-        private void PopulateStackPanel(JsonNode jsonNode, Panel parentPanel, int level = 0)
-        {
-            if (jsonNode is JsonObject jsonObject)
-            {
-                foreach (var kvp in jsonObject)
-                {
-                    var border = BuildBorder(level);
-                    var grid = BuildGrid();
-
-                    var stackPanel = new StackPanel { Margin = new Thickness(10, 5, 0, 0) };
-                    Grid.SetColumn(stackPanel, 1);
-
-                    var label = new Label { Content = kvp.Key };
-                    Grid.SetColumn(label, 0);
-                    grid.Children.Add(label);
-                    grid.Children.Add(stackPanel);
-
-                    //stackPanel.Children.Add(label);
-
-                    if (kvp.Value is JsonObject nestedObject)
-                    {
-                        PopulateStackPanel(nestedObject, stackPanel, level + 1);
-                    }
-                    else if (kvp.Value is JsonArray nestedArray)
-                    {
-                        PopulateStackPanel(nestedArray, stackPanel, level + 1);
-                    }
-                    else
-                    {
-                        var textBox = new TextBox
-                        {
-                            Text = kvp.Value.ToString(),
-                            VerticalAlignment = VerticalAlignment.Center,
-                            Margin = new Thickness(5, 5, 5, 5),
-                            Background = System.Windows.Media.Brushes.White,
-                            Style = (Style)TryFindResource("ExpandingTextBox")
-                        };
-                        textBox.SetBinding(TextBox.IsReadOnlyProperty, new Binding { Source = this, Path = new PropertyPath("IsEditing") });
-                        stackPanel.Children.Add(textBox);
-                    }
-                    border.Child = grid;
-
-                    parentPanel.Children.Add(border);
-                }
-            }
-        }
-
-        private void PopulateArrayPanel(JsonArray jsonArray, Panel parentPanel, int level = 0)
-        {
-            foreach (var item in jsonArray)
-            {
-                var border = BuildBorder(level);
-                var grid = BuildGrid();
-
-                var stackPanel = new StackPanel { Margin = new Thickness(2, 2, 2, 2) };
-                Grid.SetColumn(stackPanel, 0);
-                Grid.SetColumnSpan(stackPanel, 2);
-
-                grid.Children.Add(stackPanel);
-
-                if (item is JsonObject nestedObject)
-                {
-                    PopulateStackPanel(nestedObject, stackPanel, level + 1);
-                }
-                else if (item is JsonArray nestedArray)
-                {
-                    PopulateArrayPanel(nestedArray, stackPanel, level + 1);
-                }
-                else
-                {
-                    var textBlock = new TextBlock
-                    {
-                        Text = item.ToString(),
-                        Background = System.Windows.Media.Brushes.White,
-                        Margin = new Thickness(5, 5, 5, 5),
-                        VerticalAlignment = VerticalAlignment.Center,
-                        Style = (Style)FindResource("ExpandingTextBox")
-                    };
-                    stackPanel.Children.Add(textBlock);
-                }
-                border.Child = grid;
-
-                parentPanel.Children.Add(border);
-            }
-        }
-
-        private Border BuildBorder(int indent)
-        {
-            var border = new Border
-            {
-                BorderBrush = System.Windows.Media.Brushes.LightGray,
-                BorderThickness = new Thickness(1),
-                Margin = new Thickness(2, 2, 2, 2),
-                Padding = new Thickness(5)
-            };
-
-            if (indent % 2 == 0)
-            {
-                border.Background = System.Windows.Media.Brushes.LightGray;
-            }
-            else
-            {
-                border.Background = System.Windows.Media.Brushes.White;
-            }
-
-            return border;
-        }
-
-        private Grid BuildGrid()
-        {
-            var grid = new Grid();
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-
-            return grid;
-        }
 
         #endregion
     }
