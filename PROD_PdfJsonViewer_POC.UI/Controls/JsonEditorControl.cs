@@ -1,15 +1,17 @@
 ﻿using PROD_PdfJsonViewer_POC.UI.Helper;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace PROD_PdfJsonViewer_POC.UI.Controls
 {
-    public class JsonEditorControl : Control
+    public class JsonEditorControl : Control, INotifyPropertyChanged
     {
         #region Fields and Properties
 
@@ -18,13 +20,13 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
         public static readonly DependencyProperty JsonContentProperty =
             DependencyProperty.Register(
                 nameof(JsonContent),
-                typeof(JsonNode),
+                typeof(ObservableJsonNode),
                 typeof(JsonEditorControl),
-                new FrameworkPropertyMetadata(default(JsonNode), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnJsonContentChanged));
+                new FrameworkPropertyMetadata(default(ObservableJsonNode), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnJsonContentChanged));
 
-        public JsonNode JsonContent
+        public ObservableJsonNode JsonContent
         {
-            get => (JsonNode)GetValue(JsonContentProperty);
+            get => (ObservableJsonNode)GetValue(JsonContentProperty);
             set => SetValue(JsonContentProperty, value);
         }
 
@@ -68,8 +70,9 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
         public JsonEditorControl()
         {
             LoadCommand = new RelayCommand(LoadJson);
-            SaveCommand = new RelayCommand(SaveJson, CanSaveJson);
+            SaveCommand = new RelayCommand(SaveJsonFromUI, CanSaveJson);
             ToggleEditCommand = new RelayCommand(ToggleEdit);
+            TextChangedCommand = new RelayCommand(OnValueChanged);
         }
 
         #endregion
@@ -84,12 +87,19 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
 
         #region Event Handlers
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void RaisePropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         public event EventHandler ContentChanged;
         private static void OnJsonContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var control = (JsonEditorControl)d;
-            var oldValue = (JsonNode)e.OldValue;
-            var newValue = (JsonNode)e.NewValue;
+            var oldValue = (ObservableJsonNode)e.OldValue;
+            var newValue = (ObservableJsonNode)e.NewValue;
 
             Debug.WriteLine($"JsonContent changed from {oldValue} to {newValue}");
             Debug.WriteLine($"IsEditing: {control.IsEditing}");
@@ -110,7 +120,17 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
                 }
             }
         }
+        private void OnValueChanged()
+        {
+            RaisePropertyChanged(nameof(JsonContent));
+        }
 
+        public ICommand TextChangedCommand { get; }
+
+        private void OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            RaisePropertyChanged(nameof(JsonContent));
+        }
         #endregion
 
         #region Methods
@@ -141,7 +161,10 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
                     var newContent = JsonNode.Parse(jsonString);
 
                     // Update content and notify
-                    JsonContent = newContent;
+                    JsonContent = new ObservableJsonNode
+                    {
+                        Node = newContent
+                    };
                 }
             }
             catch (Exception ex)
@@ -155,14 +178,15 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
             try
             {
                 // If there's no content or FilePath is invalid, do nothing
-                if (JsonContent is null || string.IsNullOrWhiteSpace(FilePath))
+                if (JsonContent?.Node is null || string.IsNullOrWhiteSpace(FilePath))
                     return;
                 Debug.WriteLine($"Save JSON File...");
                 Debug.WriteLine($"FilePath: {FilePath}");
 
                 // Convert JsonNode back to a string
                 var options = new JsonSerializerOptions { WriteIndented = true };
-                string jsonString = JsonContent.ToJsonString(options);
+                string jsonString = JsonContent.Node.ToJsonString(options);
+                Debug.WriteLine(jsonString);
 
                 // Write to file
                 File.WriteAllText(FilePath, jsonString);
@@ -174,10 +198,93 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
             }
         }
 
-        private bool CanSaveJson() => JsonContent != null;
+        private bool CanSaveJson() => JsonContent?.Node != null;
 
         private void ToggleEdit() => IsEditing = !IsEditing;
 
         #endregion
+
+        #region SaveFromUI
+
+        private JsonNode ExtractJsonFromUI(DependencyObject parent)
+        {
+            if (parent is TextBox textBox)
+            {
+                // Assuming the TextBox contains a JsonValue
+                return JsonValue.Create(textBox.Text);
+            }
+            else if (parent is ItemsControl itemsControl)
+            {
+                if (itemsControl.ItemsSource is JsonArray)
+                {
+                    var jsonArray = new JsonArray();
+                    foreach (var item in itemsControl.Items)
+                    {
+                        var container = itemsControl.ItemContainerGenerator.ContainerFromItem(item) as DependencyObject;
+                        jsonArray.Add(ExtractJsonFromUI(container));
+                    }
+                    return jsonArray;
+                }
+                else if (itemsControl.ItemsSource is JsonObject)
+                {
+                    var jsonObject = new JsonObject();
+                    foreach (var item in itemsControl.Items)
+                    {
+                        var container = itemsControl.ItemContainerGenerator.ContainerFromItem(item) as DependencyObject;
+                        var keyTextBlock = FindChild<TextBlock>(container);
+                        var valueContainer = FindChild<ContentPresenter>(container);
+                        var key = keyTextBlock?.Text;
+                        var value = ExtractJsonFromUI(valueContainer);
+                        if (key != null && value != null)
+                        {
+                            jsonObject[key] = value;
+                        }
+                    }
+                    return jsonObject;
+                }
+            }
+            return null;
+        }
+
+        private T FindChild<T>(DependencyObject parent) where T : DependencyObject
+        {
+            if (parent == null) return null;
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T castChild)
+                {
+                    return castChild;
+                }
+                var foundChild = FindChild<T>(child);
+                if (foundChild != null)
+                {
+                    return foundChild;
+                }
+            }
+            return null;
+        }
+
+        public void SaveJsonFromUI()
+        {
+            // Ensure you have a named root element in your XAML, e.g., MainGrid
+            var rootElement = this.FindName("RootElement") as DependencyObject;
+            if (rootElement == null)
+            {
+                MessageBox.Show("Root element not found.");
+                return;
+            }
+
+            var jsonNode = ExtractJsonFromUI(rootElement);
+
+            // Serialize and save the JSON
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            string jsonString = jsonNode.ToJsonString(options);
+            File.WriteAllText(FilePath, jsonString);
+            MessageBox.Show("JSON saved successfully!");
+        }
+
+        #endregion
     }
+
 }

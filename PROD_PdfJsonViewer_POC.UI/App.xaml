@@ -9,6 +9,7 @@
                 <ResourceDictionary Source="Styles/Buttons.xaml" />
                 <ResourceDictionary Source="Styles/ComboBoxes.xaml" />
                 <ResourceDictionary Source="Styles/TextBoxes.xaml" />
+                <ResourceDictionary Source="Styles/TextBlocks.xaml" />
                 <ResourceDictionary Source="Themes/JsonTemplates.xaml" />
                 <ResourceDictionary Source="Themes/JsonSelector.xaml" />
                 <ResourceDictionary Source="Themes/Generic.xaml" />

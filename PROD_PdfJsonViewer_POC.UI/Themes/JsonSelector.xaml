@@ -3,6 +3,7 @@
                     xmlns:local="clr-namespace:PROD_PdfJsonViewer_POC.UI.Controls"
                     xmlns:helper="clr-namespace:PROD_PdfJsonViewer_POC.UI.Helper">
     <helper:JsonNodeTypeSelector x:Key="JsonNodeSelector"
+                             JsonObservableTemplate="{StaticResource JsonObservableTemplate}"
                              JsonObjectTemplate="{StaticResource JsonObjectTemplate}"
                              JsonArrayTemplate="{StaticResource JsonArrayTemplate}"
                              JsonValueTemplate="{StaticResource JsonValueTemplate}" />

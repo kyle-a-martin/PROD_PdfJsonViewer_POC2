@@ -8,6 +8,7 @@
 
     <!-- 1) Converter(s) -->
     <helper:JsonValueConverter x:Key="JsonValueConverter"/>
+    <helper:BooleanInverterConverter x:Key="BooleanInverterConverter"/>
 
     <!-- 
         4) Main Control Template for the custom JsonEditorControl. 
@@ -18,7 +19,8 @@
                      TargetType="local:JsonEditorControl">
         <Border BorderBrush="Gray"
                 BorderThickness="1"
-                Padding="10">
+                Padding="10"
+                HorizontalAlignment="Stretch">
             <DockPanel>
 
                 <!-- 
@@ -56,9 +58,10 @@
                 -->
                 <ScrollViewer>
                     <ContentPresenter
+                        Name="JsonContentPresenter"
                         Margin="10"
-                        DataContext="{TemplateBinding JsonContent}"
-                        Content="{TemplateBinding JsonContent}"
+                        DataContext="{Binding JsonContent, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                        Content="{Binding JsonContent, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
                         ContentTemplateSelector="{StaticResource JsonNodeSelector}" />
                 </ScrollViewer>
 
