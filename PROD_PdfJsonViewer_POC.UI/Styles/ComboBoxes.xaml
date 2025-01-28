@@ -99,7 +99,7 @@
                                 BorderThickness="{TemplateBinding BorderThickness}" 
                                 CornerRadius="5" />
                         <TextBlock 
-                                Text="{TemplateBinding Text}" 
+                                Text="{TemplateBinding Text}"
                                 VerticalAlignment="Center" 
                                 Margin="10,0,30,0" 
                                 Foreground="{TemplateBinding Foreground}" />
@@ -155,6 +155,16 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <!-- Style for ComboBox -->
+    <Style x:Key="LeftAlignedTextBlock" TargetType="ComboBox">
+        <Setter Property="Padding" Value="0,5" />
+        <Setter Property="MinWidth" Value="200" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
     </Style>
 
     <!-- ComboBox Item Style -->

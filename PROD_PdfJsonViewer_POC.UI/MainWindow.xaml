@@ -16,13 +16,19 @@
         <helper:PathToFilenameConverter x:Key="PathToFilenameConverter" />
     </Window.Resources>
     <DockPanel>
-        <ToolBar DockPanel.Dock="Top" VerticalAlignment="Top" Grid.ColumnSpan="2">
+        <ToolBar DockPanel.Dock="Top" VerticalAlignment="Top">
             <ToolBarPanel VerticalAlignment="Top" Orientation="Horizontal" Width="Auto">
-                <Button x:Name="OpenFileButton" Style="{StaticResource SquareIconButton}" fa:Awesome.Content="FolderOpen" TextElement.FontFamily="pack://application:,,,/FontAwesome.WPF;component/#FontAwesome"  Padding="5 0"  Height="30"  Command="{Binding OpenPdfFileCommand}"></Button>
-                <TextBlock x:Name="FolderPath" Text="{Binding FolderPath}" Style="{StaticResource CenteredTextBlock}"></TextBlock>
-                <ComboBox x:Name="PdfFilesComboBox" Style ="{StaticResource RoundedComboBox}" ItemsSource="{Binding PdfFiles}" SelectedItem="{Binding SelectedPdfFile}" Width="200" Margin="10 0" Padding="5 0" Height="30"></ComboBox>
-                <Button x:Name="PreviousButton" Style="{StaticResource SquareIconButton}" fa:Awesome.Content="ChevronLeft" TextElement.FontFamily="pack://application:,,,/FontAwesome.WPF;component/#FontAwesome" Padding="5 0"  Height="30"  Command="{Binding PreviousPdfCommand}" Margin="10 0"></Button>
-                <Button x:Name="NextButton"  Style="{StaticResource SquareIconButton}" fa:Awesome.Content="ChevronRight" TextElement.FontFamily="pack://application:,,,/FontAwesome.WPF;component/#FontAwesome" Padding="5 0"  Height="30"  Command="{Binding NextPdfCommand}" Margin="10 0"></Button>
+                <Button x:Name="OpenFileButton" Style="{StaticResource FolderOpenButtonStyle}" Padding="5 0"  Height="30"  Command="{Binding OpenPdfFileCommand}"></Button>
+                <TextBlock x:Name="FolderPath" Text="{Binding FolderPath}" Style="{StaticResource CenteredTextBlock}" MinWidth="200"></TextBlock>
+                <ComboBox x:Name="PdfFilesComboBox" ItemsSource="{Binding PdfFiles}" SelectedItem="{Binding SelectedPdfFile}" MinWidth="250" >
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding FileName}" Style="{StaticResource LeftAlignedTextBlock}"></TextBlock>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <Button x:Name="PreviousButton" Style="{StaticResource PrevButtonStyle}"  Height="30"  Command="{Binding PreviousPdfCommand}" Margin="10 0"></Button>
+                <Button x:Name="NextButton"  Style="{StaticResource NextButtonStyle}"  Height="30"  Command="{Binding NextPdfCommand}" Margin="10 0"></Button>
             </ToolBarPanel>
             <ToolBarPanel>
 

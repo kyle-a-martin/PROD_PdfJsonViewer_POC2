@@ -18,4 +18,15 @@
         <Setter Property="TextAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
+
+    <!-- Style for TextBlock -->
+    <Style x:Key="LeftAlignedTextBlock" TargetType="TextBlock">
+        <Setter Property="Padding" Value="0,5" />
+        <Setter Property="MinWidth" Value="200" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="TextAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+    </Style>
 </ResourceDictionary>
