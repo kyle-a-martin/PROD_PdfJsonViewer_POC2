@@ -5,6 +5,7 @@
     <helper:JsonNodeTypeSelector x:Key="JsonNodeSelector"
                              JsonObservableTemplate="{StaticResource JsonObservableTemplate}"
                              JsonObjectTemplate="{StaticResource JsonObjectTemplate}"
+                             JsonObjectWithKeyTemplate="{StaticResource JsonObjectWithKeyTemplate}"
                              JsonArrayTemplate="{StaticResource JsonArrayTemplate}"
                              JsonValueTemplate="{StaticResource JsonValueTemplate}" />
 </ResourceDictionary>

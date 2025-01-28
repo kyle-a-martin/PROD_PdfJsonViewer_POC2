@@ -19,7 +19,6 @@
                      TargetType="local:JsonEditorControl">
         <Border BorderBrush="Gray"
                 BorderThickness="1"
-                Padding="10"
                 HorizontalAlignment="Stretch">
             <DockPanel>
 
@@ -27,31 +26,23 @@
                     Controls to enter file path, load, toggle edit, and save. 
                     (unchanged from before)
                 -->
-                <StackPanel DockPanel.Dock="Top"
-                            Orientation="Horizontal"
-                            HorizontalAlignment="Stretch"
-                            Margin="0,0,0,10">
-                    <TextBlock
-                        Text="{Binding FilePath, RelativeSource={RelativeSource TemplatedParent}}"
-                        Width="300"
-                        Margin="0,0,10,0"
-                        Style="{DynamicResource LeftAlignedTextBlock}"/>
-                    <Button
-                        fa:Awesome.Content="Upload"
-                        Command="{Binding LoadCommand, RelativeSource={RelativeSource TemplatedParent}}"
-                        Margin="0,0,10,0"
-                        Style="{DynamicResource SquareIconButton}"/>
-                    <Button
-                        fa:Awesome.Content="Edit"
-                        Command="{Binding ToggleEditCommand, RelativeSource={RelativeSource TemplatedParent}}"
-                        Margin="0,0,10,0"
-                        Style="{DynamicResource SquareIconButton}"/>
-                    <Button
-                        fa:Awesome.Content="Save"
-                        Command="{Binding SaveCommand, RelativeSource={RelativeSource TemplatedParent}}"
-                        Style="{DynamicResource SquareIconButton}"/>
-                </StackPanel>
-
+                <Border DockPanel.Dock="Top" HorizontalAlignment="Stretch" BorderBrush="LightGray" BorderThickness="1">
+                    <StackPanel DockPanel.Dock="Top"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                Margin="0,5">
+                        <TextBlock
+                            Text="{Binding FilePath, RelativeSource={RelativeSource TemplatedParent}}"
+                            Style="{DynamicResource CenteredTextBlock}"/>
+                    
+                        <Button
+                            Command="{Binding ToggleEditCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                            Style="{DynamicResource EditButtonStyle}"/>
+                        <Button
+                            Command="{Binding SaveCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                            Style="{DynamicResource SaveButtonStyle}"/>
+                    </StackPanel>
+                </Border>   
                 <!-- 
                     Scrollable region to display the JSON content 
                     with a direct reference to the template selector

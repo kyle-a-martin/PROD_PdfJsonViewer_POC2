@@ -61,8 +61,9 @@
                             <TextBlock FontFamily="pack://application:,,,/FontAwesome.WPF;component/#FontAwesome"
                                        Text="{TemplateBinding Tag}" 
                                        FontSize="16"
+                                       VerticalAlignment="Center"
                                        Margin="10,0,5,0"/>
-                            <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center"  
+                            <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center" 
                                        Margin="5,0,10,0"/>
                         </StackPanel>
                     </Border>
@@ -85,6 +86,16 @@
     <Style x:Key="NextButtonStyle" TargetType="Button" BasedOn="{StaticResource SquareIconWithTextButton}">
         <Setter Property="Tag" Value="&#xf054;" />
         <Setter Property="Content" Value="Next" />
+    </Style>
+    
+    <Style x:Key="SaveButtonStyle" TargetType="Button" BasedOn="{StaticResource SquareIconWithTextButton}">
+        <Setter Property="Tag" Value="&#xf0c7;" />
+        <Setter Property="Content" Value="Save" />
+    </Style>
+    
+    <Style x:Key="EditButtonStyle" TargetType="Button" BasedOn="{StaticResource SquareIconWithTextButton}">
+        <Setter Property="Tag" Value="&#xf044;" />
+        <Setter Property="Content" Value="Edit" />
     </Style>
 
 </ResourceDictionary>

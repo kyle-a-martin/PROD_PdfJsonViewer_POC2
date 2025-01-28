@@ -23,7 +23,7 @@
                 <ComboBox x:Name="PdfFilesComboBox" ItemsSource="{Binding PdfFiles}" SelectedItem="{Binding SelectedPdfFile}" MinWidth="250" >
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding FileName}" Style="{StaticResource LeftAlignedTextBlock}"></TextBlock>
+                            <TextBlock Text="{Binding FileName}" Style="{StaticResource CenteredComboBoxTextBlock}"></TextBlock>
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
