@@ -51,10 +51,10 @@
     <!-- Template for displaying JSON Objects -->
     <DataTemplate x:Key="JsonObjectTemplate">
         <ItemsControl ItemsSource="{Binding}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Expander Header="{Binding Key}" IsExpanded="True" Margin="0">
-                            <Border Margin="10,2,2,2"
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Expander Header="{Binding Key}" IsExpanded="True" Margin="0">
+                        <Border Margin="10,2,2,2"
                                     BorderBrush="LightGray"
                                     BorderThickness="1,1,1,1"
                                     Padding="5">
@@ -62,12 +62,12 @@
                                 <ContentPresenter
                                         Content="{Binding Value}"
                                         ContentTemplateSelector="{DynamicResource JsonNodeSelector}" />
-                                </StackPanel>
-                            </Border>
-                        </Expander>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                    </Expander>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </DataTemplate>
 
     <!-- Template for displaying JSON Objects -->
