@@ -46,11 +46,11 @@ namespace PROD_PdfJsonViewer_POC.UI.Helper
                 {
                     return JsonObjectWithKeyTemplate;
                 }
-                else if(jObject.GetValueKind() == JsonValueKind.String)
+                else if (jObject.GetValueKind() == JsonValueKind.String)
                 {
                     return JsonObjectWithKeyTemplate;
                 }
-                    
+
             }
             else if (jsonNode is JsonArray)
             {

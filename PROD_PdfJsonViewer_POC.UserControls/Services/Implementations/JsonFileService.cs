@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Nodes;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using PROD_PdfJsonViewer_POC.UserControls.Services.Interfaces;
+using System.IO;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace PROD_PdfJsonViewer_POC.UserControls.Services.Implementations
 {

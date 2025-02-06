@@ -2,18 +2,11 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using PROD_PdfJsonViewer_POC.UserControls.Models;
-using PROD_PdfJsonViewer_POC.UserControls.Services.Interfaces;
 using PROD_PdfJsonViewer_POC.UserControls.Services.Implementations;
-using System;
-using System.Collections.Generic;
+using PROD_PdfJsonViewer_POC.UserControls.Services.Interfaces;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Net.Http.Json;
-using System.Text;
-using System.Text.Json.Nodes;
-using System.Threading.Tasks;
-using System.Windows.Input;
 using System.IO;
+using System.Text.Json.Nodes;
 
 namespace PROD_PdfJsonViewer_POC.UserControls.ViewModels
 {
@@ -22,9 +15,9 @@ namespace PROD_PdfJsonViewer_POC.UserControls.ViewModels
         private readonly IJsonFileService _jsonFileService;
         private readonly ILogger<JsonEditorViewModel> _logger;
 
-        public JsonEditorViewModel() 
-        { 
-            
+        public JsonEditorViewModel()
+        {
+
             _logger = new Logger<JsonEditorViewModel>(new LoggerFactory());
             _jsonFileService = new JsonFileService(new Logger<JsonFileService>(new LoggerFactory()));
         }

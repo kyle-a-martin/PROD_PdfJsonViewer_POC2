@@ -1,16 +1,13 @@
-﻿using Microsoft.Win32;
-using PROD_PdfJsonViewer_POC.UI.Helper;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Win32;
 using PROD_PdfJsonViewer_POC.UI.Model;
-using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Windows.Input;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 
 namespace PROD_PdfJsonViewer_POC.UI.ViewModel
 {

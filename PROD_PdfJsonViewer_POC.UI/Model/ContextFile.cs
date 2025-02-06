@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PROD_PdfJsonViewer_POC.UI.Model
+﻿namespace PROD_PdfJsonViewer_POC.UI.Model
 {
     public class ContextFile
     {
@@ -12,13 +6,14 @@ namespace PROD_PdfJsonViewer_POC.UI.Model
         public string FileName { get => _fileName; set => _fileName = value; }
 
         private string _filePath;
-        public string FilePath 
-            { get => _filePath;
-              set
-              { 
-                    _filePath = value; 
-                    SetFileName(value); 
-              } 
+        public string FilePath
+        {
+            get => _filePath;
+            set
+            {
+                _filePath = value;
+                SetFileName(value);
+            }
         }
 
         public ContextFile(string filePath)
