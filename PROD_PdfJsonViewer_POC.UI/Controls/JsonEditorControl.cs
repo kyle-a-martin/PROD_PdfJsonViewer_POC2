@@ -69,19 +69,19 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
 
         public JsonEditorControl()
         {
-            LoadCommand = new RelayCommand(LoadJson);
-            SaveCommand = new RelayCommand(SaveJsonFromUI, CanSaveJson);
-            ToggleEditCommand = new RelayCommand(ToggleEdit);
-            TextChangedCommand = new RelayCommand(OnValueChanged);
+            LoadCommand = new RelayCommand_old(LoadJson);
+            SaveCommand = new RelayCommand_old(SaveJsonFromUI, CanSaveJson);
+            ToggleEditCommand = new RelayCommand_old(ToggleEdit);
+            TextChangedCommand = new RelayCommand_old(OnValueChanged);
         }
 
         #endregion
 
         #region Commands
 
-        public RelayCommand LoadCommand { get; }
-        public RelayCommand SaveCommand { get; }
-        public RelayCommand ToggleEditCommand { get; }
+        public RelayCommand_old LoadCommand { get; }
+        public RelayCommand_old SaveCommand { get; }
+        public RelayCommand_old ToggleEditCommand { get; }
 
         #endregion
 

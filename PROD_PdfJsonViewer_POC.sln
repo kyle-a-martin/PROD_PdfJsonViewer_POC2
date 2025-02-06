@@ -5,7 +5,9 @@ VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PROD_PdfJsonViewer_POC.UI", "PROD_PdfJsonViewer_POC.UI\PROD_PdfJsonViewer_POC.UI.csproj", "{2E8A86E5-9715-4206-921B-D6340CD78332}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PROD_PdfJsonViewer_POC.TestConsole", "PROD_PdfJsonViewer_POC.TestConsole\PROD_PdfJsonViewer_POC.TestConsole.csproj", "{65F7D9EA-5D91-499C-B1EF-0D25202E733E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PROD_PdfJsonViewer_POC.TestConsole", "PROD_PdfJsonViewer_POC.TestConsole\PROD_PdfJsonViewer_POC.TestConsole.csproj", "{65F7D9EA-5D91-499C-B1EF-0D25202E733E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PROD_PdfJsonViewer_POC.UserControls", "PROD_PdfJsonViewer_POC.UserControls\PROD_PdfJsonViewer_POC.UserControls.csproj", "{0214D017-D128-4D19-AFB7-6D3A425A55AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{65F7D9EA-5D91-499C-B1EF-0D25202E733E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{65F7D9EA-5D91-499C-B1EF-0D25202E733E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{65F7D9EA-5D91-499C-B1EF-0D25202E733E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0214D017-D128-4D19-AFB7-6D3A425A55AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0214D017-D128-4D19-AFB7-6D3A425A55AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0214D017-D128-4D19-AFB7-6D3A425A55AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0214D017-D128-4D19-AFB7-6D3A425A55AF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
