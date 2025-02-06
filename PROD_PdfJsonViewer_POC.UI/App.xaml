@@ -2,8 +2,21 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:PROD_PdfJsonViewer_POC.UI"
-             StartupUri="MainWindow.xaml">
+             >
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles/Buttons.xaml" />
+                <ResourceDictionary Source="Styles/ComboBoxes.xaml" />
+                <ResourceDictionary Source="Styles/TextBoxes.xaml" />
+                <ResourceDictionary Source="Styles/TextBlocks.xaml" />
+                <ResourceDictionary Source="Themes/JsonTemplates.xaml" />
+                <ResourceDictionary Source="Themes/JsonSelector.xaml" />
+                <ResourceDictionary Source="Themes/Generic.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>
+
+    
+    

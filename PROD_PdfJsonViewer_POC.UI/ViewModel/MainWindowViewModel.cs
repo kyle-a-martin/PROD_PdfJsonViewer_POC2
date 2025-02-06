@@ -1,70 +1,95 @@
 ﻿using Microsoft.Win32;
 using PROD_PdfJsonViewer_POC.UI.Helper;
 using PROD_PdfJsonViewer_POC.UI.Model;
+using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace PROD_PdfJsonViewer_POC.UI.ViewModel
 {
-    internal class MainWindowViewModel : ViewModelBase
+    /// <summary>
+    /// View model for the main window.
+    /// </summary>
+    public class MainWindowViewModel : ObservableObject
     {
-        private string _selectedPdfFile;
+        private ContextFile _selectedPdfFile;
         private string _relatedJsonFile;
         private string _folderPath;
-
         private JsonDocument _jsonData;
         private Uri _pdfSource;
-
-        private MainWindow _view;
         private ObservableCollection<JsonTreeNode> _jsonTree = new ObservableCollection<JsonTreeNode>();
 
-        public ObservableCollection<string> PdfFiles { get; set; } = new ObservableCollection<string>(); // List of PDF files
+        #region Properties
 
-        public ICommand PreviousPdfCommand { get; }
-
-        public ICommand NextPdfCommand { get; }
-
-        public string SelectedPdfFile
+        public ContextFile SelectedPdfFile
         {
-            get { return _selectedPdfFile; }
-            set { SetProperty(ref _selectedPdfFile, value); LoadPdfToViewer(); }
+            get => _selectedPdfFile;
+            set
+            {
+                if (SetProperty(ref _selectedPdfFile, value))
+                {
+                    LoadPdfToViewer();
+                }
+            }
         }
 
         public string RelatedJsonFile
         {
-            get { return _relatedJsonFile; }
-            set { SetProperty(ref _relatedJsonFile, value); }
+            get => _relatedJsonFile;
+            set => SetProperty(ref _relatedJsonFile, value);
         }
 
         public string FolderPath
         {
-            get { return _folderPath; }
-            set { SetProperty(ref _folderPath, value); LoadLocalPdfFiles(); }
+            get => _folderPath;
+            set
+            {
+                if (SetProperty(ref _folderPath, value))
+                {
+                    LoadLocalPdfFiles();
+                }
+            }
         }
 
         public JsonDocument JsonData
         {
-            get { return _jsonData; }
-            set { SetProperty(ref _jsonData, value); }
+            get => _jsonData;
+            set => SetProperty(ref _jsonData, value);
         }
 
         public ObservableCollection<JsonTreeNode> JsonTree
         {
-            get { return _jsonTree; }
-            set { SetProperty(ref _jsonTree, value); }
+            get => _jsonTree;
+            set => SetProperty(ref _jsonTree, value);
         }
 
         public Uri PdfSource
         {
-            get { return _pdfSource; }
-            set { SetProperty(ref _pdfSource, value); }
+            get => _pdfSource;
+            set => SetProperty(ref _pdfSource, value);
         }
+
+        public ObservableCollection<ContextFile> PdfFiles { get; set; } = new ObservableCollection<ContextFile>();
+
+        #endregion
+
+        #region Commands
 
         public ICommand OpenPdfFileCommand { get; }
         public ICommand LoadJsonDataCommand { get; }
+        public ICommand PreviousPdfCommand { get; }
+        public ICommand NextPdfCommand { get; }
+
+        #endregion
+
+        #region Constructor
 
         public MainWindowViewModel()
         {
@@ -74,60 +99,73 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
             NextPdfCommand = new RelayCommand(NextPdf);
         }
 
-        public MainWindowViewModel(MainWindow view)
-        {
-            OpenPdfFileCommand = new RelayCommand(OpenPdfFile);
-            LoadJsonDataCommand = new RelayCommand(LoadJsonData);
-            _view = view;
-            PreviousPdfCommand = new RelayCommand(PreviousPdf);
-            NextPdfCommand = new RelayCommand(NextPdf);
-        }
+        #endregion
+
+        #region Methods
 
         private void OpenPdfFile()
         {
-            // Open file dialog and load selected PDF file
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "PDF files (*.pdf)|*.pdf";
-            openFileDialog.Title = "Select a PDF file";
+            // Open a file dialog to select a PDF file.
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Filter = "PDF files (*.pdf)|*.pdf",
+                Title = "Select a PDF file"
+            };
             if (openFileDialog.ShowDialog() == true)
             {
-                SelectedPdfFile = openFileDialog.FileName;
-                FolderPath = Path.GetDirectoryName(_selectedPdfFile) ?? "File/Folder Not Found";
+                SelectedPdfFile = new ContextFile(openFileDialog.SafeFileName, openFileDialog.FileName);
+                FolderPath = Path.GetDirectoryName(SelectedPdfFile.FilePath) ?? "File/Folder Not Found";
             }
         }
 
+        /// <summary>
+        /// Updates the PDF source and finds the related JSON file.
+        /// The view will subscribe to changes in PdfSource and navigate the WebBrowser accordingly.
+        /// </summary>
         private void LoadPdfToViewer()
         {
-            // Find the related JSON file
-            string jsonFile = GetRelatedJsonFile(_selectedPdfFile);
-            if (jsonFile != null)
+            if (SelectedPdfFile == null || string.IsNullOrEmpty(SelectedPdfFile.FilePath))
+                return;
+
+            // Find the related JSON file.
+            string jsonFile = GetRelatedJsonFile(SelectedPdfFile.FilePath);
+            if (!string.IsNullOrEmpty(jsonFile))
             {
-                // Load the JSON data and apply it to the TreeView
-                //LoadJsonData(jsonFile);
                 RelatedJsonFile = jsonFile;
             }
+            Debug.WriteLine(SelectedPdfFile.FilePath);
 
-            _pdfSource = new Uri(_selectedPdfFile);
-            _view.PdfViewer.Navigate(_pdfSource);
+            // Update the PdfSource property.
+            PdfSource = new Uri(SelectedPdfFile.FilePath);
         }
 
         private void LoadLocalPdfFiles()
         {
+            if (string.IsNullOrEmpty(FolderPath) || !Directory.Exists(FolderPath))
+                return;
 
-            // Load PDF files from local folder
             string[] pdfFiles = Directory.GetFiles(FolderPath, "*.pdf");
             PdfFiles.Clear();
             foreach (string pdfFile in pdfFiles)
             {
-                PdfFiles.Add(pdfFile);
+                PdfFiles.Add(new ContextFile(pdfFile));
             }
+
+            // Select the matching PDF file if it exists, or default to the first file.
+            int index = PdfFiles.ToList().FindIndex(f => f.FilePath == SelectedPdfFile?.FilePath);
+            if (index >= 0 && index < PdfFiles.Count)
+                SelectedPdfFile = PdfFiles[index];
+            else if (PdfFiles.Count > 0)
+                SelectedPdfFile = PdfFiles[0];
         }
 
         private void LoadJsonData()
         {
-            // Load the JSON data and apply it to the TreeView
-            string jsonFile = GetRelatedJsonFile(_selectedPdfFile);
-            if (jsonFile != null)
+            if (SelectedPdfFile == null || string.IsNullOrEmpty(SelectedPdfFile.FilePath))
+                return;
+
+            string jsonFile = GetRelatedJsonFile(SelectedPdfFile.FilePath);
+            if (!string.IsNullOrEmpty(jsonFile))
             {
                 LoadJsonData(jsonFile);
             }
@@ -135,39 +173,16 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
 
         private string GetRelatedJsonFile(string pdfFile)
         {
-            // Find related JSON file
+            // Assume the related JSON file has the same name as the PDF file, but with a .json extension.
             string jsonFile = Path.ChangeExtension(pdfFile, ".json");
-            if (File.Exists(jsonFile))
-            {
-                return jsonFile;
-            }
-            else
-            {
-                return null;
-            }
+            return File.Exists(jsonFile) ? jsonFile : string.Empty;
         }
 
         private void LoadJsonData(string jsonFile)
         {
-            // Load JSON data
             string json = File.ReadAllText(jsonFile);
             JsonData = JsonDocument.Parse(json);
         }
-
-        //private void LoadJsonData(string jsonFile)
-        //{
-        //    string json = File.ReadAllText(jsonFile);
-        //    var jsonNode = JsonNode.Parse(json);
-
-        //    JsonTree.Clear();
-
-        //    if (jsonNode != null)
-        //    {
-        //        var root = new JsonTreeNode { };
-        //        AddJsonNodeToTree(jsonNode, root);
-        //        JsonTree.Add(root);
-        //    }
-        //}
 
         private void AddJsonNodeToTree(JsonNode jsonNode, JsonTreeNode parentNode)
         {
@@ -199,12 +214,12 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
 
         private void PreviousPdf()
         {
-            int currentIndex = PdfFiles.IndexOf(SelectedPdfFile);
+            int currentIndex = PdfFiles.ToList().FindIndex(f => f.FilePath == SelectedPdfFile.FilePath);
             if (currentIndex > 0)
             {
                 SelectedPdfFile = PdfFiles[currentIndex - 1];
             }
-            else
+            else if (PdfFiles.Count > 0)
             {
                 SelectedPdfFile = PdfFiles[PdfFiles.Count - 1];
             }
@@ -212,15 +227,17 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
 
         private void NextPdf()
         {
-            int currentIndex = PdfFiles.IndexOf(SelectedPdfFile);
+            int currentIndex = PdfFiles.ToList().FindIndex(f => f.FilePath == SelectedPdfFile.FilePath);
             if (currentIndex < PdfFiles.Count - 1)
             {
                 SelectedPdfFile = PdfFiles[currentIndex + 1];
             }
-            else
+            else if (PdfFiles.Count > 0)
             {
                 SelectedPdfFile = PdfFiles[0];
             }
         }
+
+        #endregion
     }
 }

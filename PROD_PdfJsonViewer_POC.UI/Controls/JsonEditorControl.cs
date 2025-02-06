@@ -1,56 +1,47 @@
 ﻿using PROD_PdfJsonViewer_POC.UI.Helper;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace PROD_PdfJsonViewer_POC.UI.Controls
 {
-    /// <summary>
-    /// Follow steps 1a or 1b and then 2 to use this custom control in a XAML file.
-    ///
-    /// Step 1a) Using this custom control in a XAML file that exists in the current project.
-    /// Add this XmlNamespace attribute to the root element of the markup file where it is 
-    /// to be used:
-    ///
-    ///     xmlns:MyNamespace="clr-namespace:PROD_PdfJsonViewer_POC.UI.Controls"
-    ///
-    ///
-    /// Step 1b) Using this custom control in a XAML file that exists in a different project.
-    /// Add this XmlNamespace attribute to the root element of the markup file where it is 
-    /// to be used:
-    ///
-    ///     xmlns:MyNamespace="clr-namespace:PROD_PdfJsonViewer_POC.UI.Controls;assembly=PROD_PdfJsonViewer_POC.UI.Controls"
-    ///
-    /// You will also need to add a project reference from the project where the XAML file lives
-    /// to this project and Rebuild to avoid compilation errors:
-    ///
-    ///     Right click on the target project in the Solution Explorer and
-    ///     "Add Reference"->"Projects"->[Browse to and select this project]
-    ///
-    ///
-    /// Step 2)
-    /// Go ahead and use your control in the XAML file.
-    ///
-    ///     <MyNamespace:JsonEditor/>
-    ///
-    /// </summary>
-    public class JsonEditorControl : Control
+    public class JsonEditorControl : Control, INotifyPropertyChanged
     {
-        static JsonEditorControl()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(
+        #region Fields and Properties
+
+        private StackPanel _mainStackPanel;
+
+        public static readonly DependencyProperty JsonContentProperty =
+            DependencyProperty.Register(
+                nameof(JsonContent),
+                typeof(ObservableJsonNode),
                 typeof(JsonEditorControl),
-                new FrameworkPropertyMetadata(typeof(JsonEditorControl)));
+                new FrameworkPropertyMetadata(default(ObservableJsonNode), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnJsonContentChanged));
+
+        public ObservableJsonNode JsonContent
+        {
+            get => (ObservableJsonNode)GetValue(JsonContentProperty);
+            set => SetValue(JsonContentProperty, value);
         }
 
-        // Dependency Properties for external configuration
         public static readonly DependencyProperty FilePathProperty =
             DependencyProperty.Register(
                 nameof(FilePath),
                 typeof(string),
                 typeof(JsonEditorControl),
-                new PropertyMetadata(string.Empty, FilePathPropertyChanged));
+                new PropertyMetadata(string.Empty, OnFilePathPropertyChanged));
+
+        public string FilePath
+        {
+            get => (string)GetValue(FilePathProperty);
+            set => SetValue(FilePathProperty, value);
+        }
 
         public static readonly DependencyProperty IsEditingProperty =
             DependencyProperty.Register(
@@ -59,70 +50,122 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
                 typeof(JsonEditorControl),
                 new PropertyMetadata(false));
 
-        // Internal state for JSON content
-        private JsonNode _jsonContent;
-
-        // Public properties
-        public string FilePath
-        {
-            get => (string)GetValue(FilePathProperty);
-            set => SetValue(FilePathProperty, value);
-        }
-
-        private static void FilePathPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var control = d as JsonEditorControl;
-            if (control != null)
-            {
-                string? newFilePath = e.NewValue as string;
-                string? oldFilePath = e.OldValue as string;
-                if (newFilePath != oldFilePath)
-                {
-                    control.LoadJson();
-                }
-            }
-        }
-
         public bool IsEditing
         {
             get => (bool)GetValue(IsEditingProperty);
             set => SetValue(IsEditingProperty, value);
         }
 
-        // Read-only access to JSON content if needed
-        public JsonNode JsonContent => _jsonContent;
+        #endregion
 
-        // Event to notify of content changes
-        public event EventHandler ContentChanged;
+        #region Constructors and Initialization
 
-        // Commands for button actions
-        public RelayCommand LoadCommand { get; }
-        public RelayCommand SaveCommand { get; }
-        public RelayCommand ToggleEditCommand { get; }
+        static JsonEditorControl()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(
+                typeof(JsonEditorControl),
+                new FrameworkPropertyMetadata(typeof(JsonEditorControl)));
+        }
 
         public JsonEditorControl()
         {
-            LoadCommand = new RelayCommand(LoadJson);
-            SaveCommand = new RelayCommand(SaveJson, CanSaveJson);
-            ToggleEditCommand = new RelayCommand(ToggleEdit);
+            LoadCommand = new RelayCommand_old(LoadJson);
+            SaveCommand = new RelayCommand_old(SaveJsonFromUI, CanSaveJson);
+            ToggleEditCommand = new RelayCommand_old(ToggleEdit);
+            TextChangedCommand = new RelayCommand_old(OnValueChanged);
+        }
+
+        #endregion
+
+        #region Commands
+
+        public RelayCommand_old LoadCommand { get; }
+        public RelayCommand_old SaveCommand { get; }
+        public RelayCommand_old ToggleEditCommand { get; }
+
+        #endregion
+
+        #region Event Handlers
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void RaisePropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public event EventHandler ContentChanged;
+        private static void OnJsonContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = (JsonEditorControl)d;
+            var oldValue = (ObservableJsonNode)e.OldValue;
+            var newValue = (ObservableJsonNode)e.NewValue;
+
+            Debug.WriteLine($"JsonContent changed from {oldValue} to {newValue}");
+            Debug.WriteLine($"IsEditing: {control.IsEditing}");
+            Debug.WriteLine($"FilePath: {control.FilePath}");
+
+            control.ContentChanged?.Invoke(control, EventArgs.Empty);
+        }
+
+        private static void OnFilePathPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is JsonEditorControl control)
+            {
+                var newFilePath = e.NewValue as string;
+                var oldFilePath = e.OldValue as string;
+                if (!string.Equals(newFilePath, oldFilePath, StringComparison.OrdinalIgnoreCase))
+                {
+                    control.LoadJson();
+                }
+            }
+        }
+        private void OnValueChanged()
+        {
+            RaisePropertyChanged(nameof(JsonContent));
+        }
+
+        public ICommand TextChangedCommand { get; }
+
+        private void OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            RaisePropertyChanged(nameof(JsonContent));
+        }
+        #endregion
+
+        #region Methods
+
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+
+            //_mainStackPanel = (StackPanel)GetTemplateChild("MainStackPanel");
+
+            //if (_mainStackPanel is null)
+            //    throw new InvalidOperationException("Could not find MainStackPanel in template.");
         }
 
         private void LoadJson()
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(FilePath) || !File.Exists(FilePath))
+                if (!string.IsNullOrWhiteSpace(FilePath) && !File.Exists(FilePath))
                 {
                     MessageBox.Show("Please specify a valid file path.");
                     return;
                 }
 
-                string jsonString = File.ReadAllText(FilePath);
-                var newContent = JsonNode.Parse(jsonString);
+                if (File.Exists(FilePath))
+                {
+                    string jsonString = File.ReadAllText(FilePath);
+                    var newContent = JsonNode.Parse(jsonString);
 
-                // Update content and notify
-                UpdateContent(newContent);
-                
+                    // Update content and notify
+                    JsonContent = new ObservableJsonNode
+                    {
+                        Node = newContent
+                    };
+                }
             }
             catch (Exception ex)
             {
@@ -134,11 +177,18 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
         {
             try
             {
-                if (_jsonContent == null || string.IsNullOrWhiteSpace(FilePath))
+                // If there's no content or FilePath is invalid, do nothing
+                if (JsonContent?.Node is null || string.IsNullOrWhiteSpace(FilePath))
                     return;
+                Debug.WriteLine($"Save JSON File...");
+                Debug.WriteLine($"FilePath: {FilePath}");
 
-                var options = new System.Text.Json.JsonSerializerOptions { WriteIndented = true };
-                string jsonString = _jsonContent.ToJsonString(options);
+                // Convert JsonNode back to a string
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                string jsonString = JsonContent.Node.ToJsonString(options);
+                Debug.WriteLine(jsonString);
+
+                // Write to file
                 File.WriteAllText(FilePath, jsonString);
                 MessageBox.Show("JSON saved successfully!");
             }
@@ -148,26 +198,93 @@ namespace PROD_PdfJsonViewer_POC.UI.Controls
             }
         }
 
-        private bool CanSaveJson() => _jsonContent != null;
+        private bool CanSaveJson() => JsonContent?.Node != null;
 
         private void ToggleEdit() => IsEditing = !IsEditing;
 
-        // Helper method to update content and raise change notification
-        private void UpdateContent(JsonNode newContent)
-        {
-            _jsonContent = newContent;
-            ContentChanged?.Invoke(this, EventArgs.Empty);
+        #endregion
 
-            // Force a refresh of the visual tree
-            var template = Template;
-            if (template != null)
+        #region SaveFromUI
+
+        private JsonNode ExtractJsonFromUI(DependencyObject parent)
+        {
+            if (parent is TextBox textBox)
             {
-                var contentPresenter = template.FindName("PART_ContentPresenter", this) as ContentPresenter;
-                if (contentPresenter != null)
+                // Assuming the TextBox contains a JsonValue
+                return JsonValue.Create(textBox.Text);
+            }
+            else if (parent is ItemsControl itemsControl)
+            {
+                if (itemsControl.ItemsSource is JsonArray)
                 {
-                    contentPresenter.Content = _jsonContent;
+                    var jsonArray = new JsonArray();
+                    foreach (var item in itemsControl.Items)
+                    {
+                        var container = itemsControl.ItemContainerGenerator.ContainerFromItem(item) as DependencyObject;
+                        jsonArray.Add(ExtractJsonFromUI(container));
+                    }
+                    return jsonArray;
+                }
+                else if (itemsControl.ItemsSource is JsonObject)
+                {
+                    var jsonObject = new JsonObject();
+                    foreach (var item in itemsControl.Items)
+                    {
+                        var container = itemsControl.ItemContainerGenerator.ContainerFromItem(item) as DependencyObject;
+                        var keyTextBlock = FindChild<TextBlock>(container);
+                        var valueContainer = FindChild<ContentPresenter>(container);
+                        var key = keyTextBlock?.Text;
+                        var value = ExtractJsonFromUI(valueContainer);
+                        if (key != null && value != null)
+                        {
+                            jsonObject[key] = value;
+                        }
+                    }
+                    return jsonObject;
                 }
             }
+            return null;
         }
+
+        private T FindChild<T>(DependencyObject parent) where T : DependencyObject
+        {
+            if (parent == null) return null;
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T castChild)
+                {
+                    return castChild;
+                }
+                var foundChild = FindChild<T>(child);
+                if (foundChild != null)
+                {
+                    return foundChild;
+                }
+            }
+            return null;
+        }
+
+        public void SaveJsonFromUI()
+        {
+            // Ensure you have a named root element in your XAML, e.g., MainGrid
+            var rootElement = this.FindName("RootElement") as DependencyObject;
+            if (rootElement == null)
+            {
+                MessageBox.Show("Root element not found.");
+                return;
+            }
+
+            var jsonNode = ExtractJsonFromUI(rootElement);
+
+            // Serialize and save the JSON
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            string jsonString = jsonNode.ToJsonString(options);
+            File.WriteAllText(FilePath, jsonString);
+            MessageBox.Show("JSON saved successfully!");
+        }
+
+        #endregion
     }
+
 }

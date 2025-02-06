@@ -1,0 +1,127 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:PROD_PdfJsonViewer_POC.UI.Controls"
+                    xmlns:helper="clr-namespace:PROD_PdfJsonViewer_POC.UI.Helper">
+    <helper:JsonValueConverter x:Key="JsonValueConverter"/>
+    <helper:BooleanInverterConverter x:Key="BooleanInverterConverter"/>
+
+    <!-- Template for displaying JSON Arrays -->
+    <DataTemplate x:Key="JsonArrayTemplate">
+        <Expander  IsExpanded="True" Margin="0">
+            <ItemsControl ItemsSource="{Binding}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="10,2,2,2"
+                                BorderBrush="LightGray"
+                                BorderThickness="0,0,0,1"
+                                Padding="5">
+                            <ContentPresenter
+                                Content="{Binding}"
+                                ContentTemplateSelector="{DynamicResource JsonNodeSelector}" />
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Expander>
+    </DataTemplate>
+
+    <!-- Template for displaying Observable Parent JSON Objects -->
+    <DataTemplate x:Key="JsonObservableTemplate">
+        <ItemsControl ItemsSource="{Binding Node}" x:Name="RootElement">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Expander Header="{Binding Key}" IsExpanded="True" Margin="0">
+                        <Border Margin="10,2,2,2"
+                                    BorderBrush="LightGray"
+                                    BorderThickness="1,1,1,1"
+                                    Padding="5">
+                            <StackPanel Orientation="Horizontal">
+                                
+                                <ContentPresenter
+                                        Content="{Binding Value}"
+                                        ContentTemplateSelector="{DynamicResource JsonNodeSelector}" />
+                            </StackPanel>
+                        </Border>
+                    </Expander>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </DataTemplate>
+
+    <!-- Template for displaying JSON Objects -->
+    <DataTemplate x:Key="JsonObjectTemplate">
+        <ItemsControl ItemsSource="{Binding}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Expander Header="{Binding Key}" IsExpanded="True" Margin="0">
+                        <Border Margin="10,2,2,2"
+                                    BorderBrush="LightGray"
+                                    BorderThickness="1,1,1,1"
+                                    Padding="5">
+                            <StackPanel Orientation="Horizontal">
+                                <ContentPresenter
+                                        Content="{Binding Value}"
+                                        ContentTemplateSelector="{DynamicResource JsonNodeSelector}" />
+                            </StackPanel>
+                        </Border>
+                    </Expander>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </DataTemplate>
+
+    <!-- Template for displaying JSON Objects -->
+    <DataTemplate x:Key="JsonObjectWithKeyTemplate">
+        <ItemsControl ItemsSource="{Binding}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Margin="10,2,2,2"
+                                BorderBrush="LightGray"
+                                BorderThickness="1,1,1,1"
+                                Padding="5">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Key}"
+                                           FontWeight="Bold"
+                                           Style="{StaticResource StyledTextBlock}"/>
+                            <ContentPresenter
+                                    Content="{Binding Value}"
+                                    ContentTemplateSelector="{DynamicResource JsonNodeSelector}" />
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </DataTemplate>
+
+    <!-- Template for displaying JSON Values -->
+    <DataTemplate x:Key="JsonValueTemplate">
+        <TextBox Text="{Binding Path=., Converter={StaticResource JsonValueConverter}, Mode=OneWay}"
+                 TextWrapping="Wrap"
+                 AcceptsReturn="True"
+                 Width="Auto"
+                 MinWidth="100"
+                 MaxWidth="400"
+                 IsReadOnly="{Binding IsEditing, Converter={StaticResource BooleanInverterConverter}, RelativeSource={RelativeSource AncestorType={x:Type local:JsonEditorControl}}}">
+            <TextBox.Style>
+                <Style TargetType="TextBox">
+                    <Setter Property="Foreground" Value="#333" />
+                    <Setter Property="Background" Value="White" />
+                    <Setter Property="Padding" Value="10,5" />
+                    <Setter Property="Margin" Value="5" />
+                    <Setter Property="BorderBrush" Value="#e0e0e0" />
+                    <Setter Property="BorderThickness" Value="1" />
+                    <Setter Property="FontFamily" Value="Segoe UI" />
+                    <Setter Property="FontSize" Value="14" />
+                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsEditing, Converter={StaticResource BooleanInverterConverter}, RelativeSource={RelativeSource AncestorType={x:Type local:JsonEditorControl}}}"
+                                     Value="True">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Style>
+        </TextBox>
+    </DataTemplate>
+</ResourceDictionary>

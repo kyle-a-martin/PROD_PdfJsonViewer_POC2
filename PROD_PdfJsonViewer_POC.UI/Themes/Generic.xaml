@@ -1,156 +1,71 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="clr-namespace:PROD_PdfJsonViewer_POC.UI.Controls"
-                    xmlns:helper="clr-namespace:PROD_PdfJsonViewer_POC.UI.Helper">
+﻿<!-- ResourceDictionary.xaml -->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:PROD_PdfJsonViewer_POC.UI.Controls"
+    xmlns:helper="clr-namespace:PROD_PdfJsonViewer_POC.UI.Helper"
+    xmlns:fa="http://schemas.fontawesome.io/icons/">
 
+    <!-- 1) Converter(s) -->
     <helper:JsonValueConverter x:Key="JsonValueConverter"/>
-    <helper:JsonNodeTypeSelector x:Key="JsonNodeTypeSelector" />
-  
-  
-    <!-- Template for displaying JSON Arrays -->
-    <DataTemplate x:Key="JsonArrayTemplate">
-        <ItemsControl ItemsSource="{Binding}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Border 
-                        Margin="20,2,2,2" 
-                        BorderBrush="LightGray" 
-                        BorderThickness="0,0,0,1"
-                        Padding="5">
-                        <ContentPresenter 
-                            Content="{Binding}" 
-                            ContentTemplateSelector="{StaticResource JsonNodeTypeSelector}"/>
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-    </DataTemplate>
+    <helper:BooleanInverterConverter x:Key="BooleanInverterConverter"/>
 
-    <!-- Template for displaying JSON Objects -->
-    <DataTemplate x:Key="JsonObjectTemplate">
-        <ItemsControl ItemsSource="{Binding Value}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Border 
-                        Margin="20,2,2,2" 
-                        BorderBrush="LightGray" 
-                        BorderThickness="0,0,0,1"
-                        Padding="5">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock 
-                                Text="{Binding Key}" 
-                                FontWeight="Bold" 
-                                Margin="0,0,10,0"/>
-                            <ContentPresenter 
-                                Content="{Binding Value}" 
-                                ContentTemplateSelector="{StaticResource JsonNodeTypeSelector}"/>
-                        </StackPanel>
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-    </DataTemplate>
-
-    <!-- Template for displaying JSON Values -->
-    <DataTemplate x:Key="JsonValueTemplate">
-        <TextBox 
-            Text="{Binding AsValue.ToString(), Converter={StaticResource JsonValueConverter}, UpdateSourceTrigger=PropertyChanged}"
-            IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBooleanConverter}, 
-                        RelativeSource={RelativeSource AncestorType=local:JsonEditorControl}}"
-            TextWrapping="Wrap"
-            AcceptsReturn="True"
-            MaxWidth="400"
-            MinWidth="100">
-            <TextBox.Style>
-                <Style TargetType="TextBox">
-                    <Style.Triggers>
-                        <DataTrigger 
-                            Binding="{Binding IsEditing, 
-                                     RelativeSource={RelativeSource AncestorType=local:JsonEditorControl}}" 
-                            Value="False">
-                            <Setter Property="Background" Value="Transparent"/>
-                            <Setter Property="BorderThickness" Value="0"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBox.Style>
-        </TextBox>
-    </DataTemplate>
-
-  <!-- Selector for displaying JSON nodes -->
-  <helper:JsonNodeTypeSelector x:Key="JsonNodeTypeSelector"
-                              JsonArrayTemplate="{StaticResource JsonArrayTemplate}"
-                              JsonObjectTemplate="{StaticResource JsonObjectTemplate}"
-                              JsonValueTemplate="{StaticResource JsonValueTemplate}"
-                              />
-
-    <!-- Main template for any JSON node -->
-    <DataTemplate x:Key="JsonNodeTemplate">
-        <ContentControl Content="{Binding}">
-            <ContentControl.Style>
-                <Style TargetType="ContentControl">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding GetType}" Value="JsonArray">
-                            <Setter Property="ContentTemplate" 
-                                    Value="{StaticResource JsonArrayTemplate}"/>
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding GetType}" Value="JsonObject">
-                            <Setter Property="ContentTemplate" 
-                                    Value="{StaticResource JsonObjectTemplate}"/>
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding GetType}" Value="JsonValue">
-                            <Setter Property="ContentTemplate" 
-                                    Value="{StaticResource JsonValueTemplate}"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </ContentControl.Style>
-        </ContentControl>
-    </DataTemplate>
-
-    <!-- Main Control Template -->
-    <ControlTemplate x:Key="JsonEditorControlTemplate" TargetType="local:JsonEditorControl">
-        <Border BorderBrush="Gray" BorderThickness="1" Padding="10">
+    <!-- 
+        4) Main Control Template for the custom JsonEditorControl. 
+           Notice there's no "JsonNodeStyle." We directly use the
+           ContentTemplateSelector in the top-level ContentPresenter below.
+    -->
+    <ControlTemplate x:Key="JsonEditorControlTemplate"
+                     TargetType="local:JsonEditorControl">
+        <Border BorderBrush="Gray"
+                BorderThickness="1"
+                HorizontalAlignment="Stretch">
             <DockPanel>
-                <!-- Header -->
-                <TextBlock 
-                    Text="JSON Editor"
-                    Margin="0,0,0,10"
-                    FontSize="16"
-                    Foreground="Red"
-                    FontWeight="Bold"/>
-                
-                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,10">
-                    <TextBox 
-                        Text="{Binding FilePath, RelativeSource={RelativeSource TemplatedParent}}"
-                        Width="300" 
-                        Margin="0,0,10,0"/>
-                    <Button 
-                        Content="Load" 
-                        Command="{Binding LoadCommand, RelativeSource={RelativeSource TemplatedParent}}"
-                        Margin="0,0,10,0"/>
-                    <Button 
-                        Content="Toggle Edit" 
-                        Command="{Binding ToggleEditCommand, RelativeSource={RelativeSource TemplatedParent}}"
-                        Margin="0,0,10,0"/>
-                    <Button 
-                        Content="Save" 
-                        Command="{Binding SaveCommand, RelativeSource={RelativeSource TemplatedParent}}"/>
-                </StackPanel>
 
+                <!-- 
+                    Controls to enter file path, load, toggle edit, and save. 
+                    (unchanged from before)
+                -->
+                <Border DockPanel.Dock="Top" HorizontalAlignment="Stretch" BorderBrush="LightGray" BorderThickness="1">
+                    <StackPanel DockPanel.Dock="Top"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                Margin="0,5">
+                        <TextBlock
+                            Text="{Binding FilePath, RelativeSource={RelativeSource TemplatedParent}}"
+                            Style="{DynamicResource CenteredTextBlock}"/>
+                    
+                        <Button
+                            Command="{Binding ToggleEditCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                            Style="{DynamicResource EditButtonStyle}"/>
+                        <Button
+                            Command="{Binding SaveCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                            Style="{DynamicResource SaveButtonStyle}"/>
+                    </StackPanel>
+                </Border>   
+                <!-- 
+                    Scrollable region to display the JSON content 
+                    with a direct reference to the template selector
+                -->
                 <ScrollViewer>
-                    <ContentPresenter 
-                        x:Name="PART_ContentPresenter"
-                        Content="{Binding JsonContent, RelativeSource={RelativeSource TemplatedParent}, Mode=OneWay}"
-                        ContentTemplateSelector="{StaticResource JsonNodeTypeSelector}"/>
+                    <ContentPresenter
+                        Name="JsonContentPresenter"
+                        Margin="10"
+                        DataContext="{Binding JsonContent, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                        Content="{Binding JsonContent, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                        ContentTemplateSelector="{StaticResource JsonNodeSelector}" />
                 </ScrollViewer>
+
             </DockPanel>
         </Border>
     </ControlTemplate>
 
+    <!-- 
+        5) Finally, the style that applies our ControlTemplate to 
+           all JsonEditorControl instances (no extra references needed).
+    -->
     <Style TargetType="local:JsonEditorControl">
-        <Setter Property="Template" Value="{StaticResource JsonEditorControlTemplate}"/>
+        <Setter Property="Template" Value="{StaticResource JsonEditorControlTemplate}" />
     </Style>
-
 
 </ResourceDictionary>

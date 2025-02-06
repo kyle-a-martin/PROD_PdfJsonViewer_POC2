@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Nodes;
+﻿using System.Globalization;
+using System.Text.Json.Nodes;
 using System.Windows.Data;
 
 namespace PROD_PdfJsonViewer_POC.UI.Helper
@@ -13,12 +14,33 @@ namespace PROD_PdfJsonViewer_POC.UI.Helper
         /// <param name="parameter"></param>
         /// <param name="culture"></param>
         /// <returns></returns>
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is JsonValue jsonValue)
             {
+                // Try bool
+                if (jsonValue.TryGetValue<bool>(out bool boolVal))
+                    return boolVal.ToString();
+
+                // Try int
+                if (jsonValue.TryGetValue<int>(out int intVal))
+                    return intVal.ToString();
+
+                // Try double
+                if (jsonValue.TryGetValue<double>(out double doubleVal))
+                    return doubleVal.ToString(culture);
+
+                // Try string
+                if (jsonValue.TryGetValue<string>(out string strVal))
+                    return strVal;
+
+                // If we reach here, it's a primitive of some other type 
+                // (or the library sees it as something else).
+                // Fallback: show the raw JSON.
                 return jsonValue.ToJsonString();
             }
+
+            // If it's not a JsonValue, return empty (or handle differently).
             return string.Empty;
         }
 
@@ -37,7 +59,7 @@ namespace PROD_PdfJsonViewer_POC.UI.Helper
             {
                 try
                 {
-                    return JsonValue.Parse(strValue);
+                    return JsonNode.Parse(strValue);
                 }
                 catch
                 {

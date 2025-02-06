@@ -2,7 +2,7 @@
 
 namespace PROD_PdfJsonViewer_POC.UI.Model
 {
-    internal class JsonTreeNode
+    public class JsonTreeNode
     {
         public string Name { get; set; }
         public string Value { get; set; }

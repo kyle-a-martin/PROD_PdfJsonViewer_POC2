@@ -6,53 +6,48 @@
         xmlns:local="clr-namespace:PROD_PdfJsonViewer_POC.UI" 
         xmlns:controls="clr-namespace:PROD_PdfJsonViewer_POC.UI.Controls"
         xmlns:helper="clr-namespace:PROD_PdfJsonViewer_POC.UI.Helper"
-        mc:Ignorable="d"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
         xmlns:vm="clr-namespace:PROD_PdfJsonViewer_POC.UI.ViewModel"
+        xmlns:jsoneditor="clr-namespace:PROD_PdfJsonViewer_POC.UserControls.Controls;assembly=PROD_PdfJsonViewer_POC.UserControls"
+        mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel, IsDesignTimeCreatable=True}"
-        Title="DataBank - JSON Validator" Height="675" MinWidth="1200">
+        Title="DataBank - JSON Validator" Height="675" Width="1200">
     <Window.Resources>
         <helper:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+        <helper:PathToFilenameConverter x:Key="PathToFilenameConverter" />
     </Window.Resources>
     <DockPanel>
-        <ToolBar DockPanel.Dock="Top" VerticalAlignment="Top" Grid.ColumnSpan="2">
+        <ToolBar DockPanel.Dock="Top" VerticalAlignment="Top">
             <ToolBarPanel VerticalAlignment="Top" Orientation="Horizontal" Width="Auto">
-                <Button x:Name="OpenFileButton" Content="Open File" Padding="5 0"  Height="30"  Command="{Binding OpenPdfFileCommand}"></Button>
-                <TextBlock x:Name="FolderPath" Text="{Binding FolderPath}" Margin="10 0" Padding="5 0"  Height="30" Width="Auto" MaxWidth="200"></TextBlock>
-                <ComboBox x:Name="PdfFilesComboBox" ItemsSource="{Binding PdfFiles}" SelectedItem="{Binding SelectedPdfFile}" Width="200" Margin="10 0" Padding="5 0" Height="30"></ComboBox>
-                <Button x:Name="PreviousButton" Content="Previous" Padding="5 0"  Height="30"  Command="{Binding PreviousPdfCommand}" Margin="10 0"></Button>
-                <Button x:Name="NextButton" Content="Next" Padding="5 0"  Height="30"  Command="{Binding NextPdfCommand}" Margin="10 0"></Button>
-            </ToolBarPanel>
-            <ToolBarPanel>
-
+                <Button x:Name="OpenFileButton" Style="{StaticResource FolderOpenButtonStyle}" Padding="5 0"  
+                        Height="30"  Command="{Binding OpenPdfFileCommand}" />
+                <TextBlock x:Name="FolderPath" Text="{Binding FolderPath}" Style="{StaticResource CenteredTextBlock}" MinWidth="200"/>
+                <ComboBox x:Name="PdfFilesComboBox" ItemsSource="{Binding PdfFiles}" SelectedItem="{Binding SelectedPdfFile}" MinWidth="250">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding FileName}" Style="{StaticResource CenteredComboBoxTextBlock}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <Button x:Name="PreviousButton" Style="{StaticResource PrevButtonStyle}"  Height="30"  
+                        Command="{Binding PreviousPdfCommand}" Margin="10 0"/>
+                <Button x:Name="NextButton"  Style="{StaticResource NextButtonStyle}"  Height="30"  
+                        Command="{Binding NextPdfCommand}" Margin="10 0"/>
             </ToolBarPanel>
         </ToolBar>
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="615*"></RowDefinition>
+                <RowDefinition Height="615*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="580*"></ColumnDefinition>
-                <ColumnDefinition Width="580*"></ColumnDefinition>
+                <ColumnDefinition Width="650*"/>
+                <ColumnDefinition Width="650*"/>
             </Grid.ColumnDefinitions>
-            <ScrollViewer Grid.Column="0" Grid.Row="0">
-                <WebBrowser x:Name="PdfViewer"  MinHeight="600" MinWidth="600" HorizontalAlignment="Left" VerticalAlignment="Bottom"></WebBrowser>
-            </ScrollViewer>
-            <ScrollViewer Grid.Column="1" Grid.Row="0">
-                <!--<TreeView x:Name="JsonViewer" ItemsSource="{Binding JsonTree}" Margin="0" Padding="10 5 10 5" HorizontalAlignment="Right" VerticalAlignment="Bottom" MinWidth="580" MinHeight="600">
-                    <TreeView.ItemTemplate>
-                        <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding Name}" FontWeight="Bold" Margin="0,0,5,0"/>
-                                <TextBox Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Width="Auto"
-                                         Visibility="{Binding Value, Converter={StaticResource NullToVisibilityConverter}}"/>
-                            </StackPanel>
-                        </HierarchicalDataTemplate>
-                    </TreeView.ItemTemplate>
-                </TreeView>-->
-
-                <controls:JsonEditorControl x:Name="JsonViewer" FilePath="{Binding RelatedJsonFile}" Margin="0" Padding="10 5 10 5" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="580" Height="600" MinWidth="580" MinHeight="600"></controls:JsonEditorControl>
-
-            </ScrollViewer>
+            <!-- PDF Viewer on the left -->
+            <WebBrowser x:Name="PdfViewer" Grid.Column="0" Grid.Row="0" MinHeight="600" 
+                        Height="Auto" MinWidth="600" HorizontalAlignment="Left" VerticalAlignment="Stretch"/>
+            <!-- JSON Editor control on the right -->
+            <jsoneditor:JsonEditorControl x:Name="JsonEditor" FilePath="{Binding DataContext.RelatedJsonFile, RelativeSource={RelativeSource AncestorType=Window}}" Height="Auto" Width="Auto" Grid.Column="1" Grid.Row="0"/>
         </Grid>
     </DockPanel>
 </Window>

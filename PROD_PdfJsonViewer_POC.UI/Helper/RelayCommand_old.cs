@@ -2,17 +2,17 @@
 
 namespace PROD_PdfJsonViewer_POC.UI.Helper
 {
-    public class RelayCommand : ICommand
+    public class RelayCommand_old : ICommand
     {
         private readonly Action _execute;
         private readonly Func<bool> _canExecute;
 
-        public RelayCommand(Action execute)
+        public RelayCommand_old(Action execute)
             : this(execute, null)
         {
         }
 
-        public RelayCommand(Action execute, Func<bool> canExecute)
+        public RelayCommand_old(Action execute, Func<bool> canExecute)
         {
             _execute = execute ?? throw new ArgumentNullException(nameof(execute));
             _canExecute = canExecute;
