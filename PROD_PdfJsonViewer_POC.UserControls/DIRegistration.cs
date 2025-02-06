@@ -1,13 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using PROD_PdfJsonViewer_POC.UserControls.Services.Interfaces;
-using PROD_PdfJsonViewer_POC.UserControls.Services.Implementations;
-using PROD_PdfJsonViewer_POC.UserControls.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using PROD_PdfJsonViewer_POC.UserControls.Services.Implementations;
+using PROD_PdfJsonViewer_POC.UserControls.Services.Interfaces;
+using PROD_PdfJsonViewer_POC.UserControls.ViewModels;
 
 namespace PROD_PdfJsonViewer_POC.UserControls
 {

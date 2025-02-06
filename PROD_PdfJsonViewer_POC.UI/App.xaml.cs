@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using PROD_PdfJsonViewer_POC.UserControls;
-using Microsoft.Extensions.Logging;
-using System.Windows;
 using PROD_PdfJsonViewer_POC.UI.ViewModel;
+using System.Windows;
 
 namespace PROD_PdfJsonViewer_POC.UI
 {

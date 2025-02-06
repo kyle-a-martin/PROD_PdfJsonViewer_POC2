@@ -1,8 +1,6 @@
-﻿using System.ComponentModel;
+﻿using PROD_PdfJsonViewer_POC.UI.ViewModel;
+using System.ComponentModel;
 using System.Windows;
-using PROD_PdfJsonViewer_POC.UI.ViewModel;
-using PROD_PdfJsonViewer_POC.UserControls.ViewModels;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace PROD_PdfJsonViewer_POC.UI
 {
