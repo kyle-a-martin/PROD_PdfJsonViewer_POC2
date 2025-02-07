@@ -140,14 +140,13 @@
         
         <!-- Style for TextBlock - Left Aligned -->
         <Style x:Key="LeftAlignTextBlock" TargetType="TextBlock">
-            <Setter Property="Padding" Value="0,5" />
-            <Setter Property="Margin" Value="0" />
             <Setter Property="FontFamily" Value="Segoe UI" />
             <Setter Property="FontSize" Value="14" />
             <Setter Property="TextAlignment" Value="Left" />
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
 
+        <!-- Modern ToggleButton Style -->
         <Style TargetType="ToggleButton" x:Key="ModernToggleButton">
             <Setter Property="Background" Value="#00263d" />
             <Setter Property="Foreground" Value="White" />
@@ -159,6 +158,7 @@
             <Setter Property="FontSize" Value="14" />
             <Setter Property="Margin" Value="5" />
             <Setter Property="Tag" Value="&#xf204;" />
+            
             <!-- Default to Toggle Off icon -->
             <Setter Property="Template">
                 <Setter.Value>
@@ -204,29 +204,46 @@
 
         <!-- DataTemplate for leaf nodes (simple key/value pairs) -->
         <DataTemplate x:Key="JsonLeafTemplate" DataType="{x:Type models:JsonTreeItem}">
-            <StackPanel Orientation="Horizontal" Margin="2">
-                <TextBlock Text="{Binding Key}" FontWeight="Bold" Margin="0,0,5,0"/>
-                <TextBlock Text=": " />
-                <!-- Editable TextBox for values -->
-                <TextBox Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource EditorTextBox}"
-                          IsReadOnly="{Binding DataContext.IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBooleanConverter}}"  AcceptsReturn="True" TextWrapping="Wrap" Width="Auto" HorizontalAlignment="Stretch"/>
-            </StackPanel>
+            <WrapPanel Orientation="Vertical" Margin="2">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Key, StringFormat={}{0} -}" FontWeight="Bold" Margin="0,0,2,0" Grid.Column="0"/>
+                    <!-- Editable TextBox for values -->
+                    <TextBox Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                             Style="{StaticResource EditorTextBox}"
+                             IsReadOnly="{Binding DataContext.IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBooleanConverter}}"  
+                             AcceptsReturn="True" 
+                             TextWrapping="Wrap" 
+                             Grid.Column="1" 
+                             HorizontalAlignment="Stretch"/>
+                </Grid>
+            </WrapPanel>
         </DataTemplate>
 
         <!-- HierarchicalDataTemplate for group nodes with multiple children -->
         <HierarchicalDataTemplate x:Key="JsonGroupTemplate" DataType="{x:Type models:JsonTreeItem}" ItemsSource="{Binding Children}">
-            <StackPanel Orientation="Horizontal" Margin="2">
-                <Border Background="Gray" Margin="0,0,5,0" Width="5" />
-                <TextBlock Text="{Binding Key}" FontWeight="Bold" Margin="0,0,5,0"/>
-                <!-- Optional group indicator -->
-                <TextBlock Text="(Group)" Foreground="Gray" Margin="0,0,5,0"/>
+            <StackPanel Orientation="Horizontal" Margin="0">
+                <Border Background="Gray" Margin="0,0,2,0" Width="5"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Show the parent's key, a dot separator, then the child's key -->
+                    <TextBlock Text="{Binding Key}" FontWeight="Bold"  Padding="5" Margin="0,0,2,0" Grid.Column="0" Style="{StaticResource LeftAlignTextBlock}"/>
+                    <!-- Optional group indicator -->
+                    <!--<TextBlock Text="(Group)" Foreground="Gray" Margin="0,0,5,0" Grid.Column="0"/>-->
+                </Grid>
             </StackPanel>
         </HierarchicalDataTemplate>
 
         <!-- DataTemplate for flattened nodes: groups that have one child that is a leaf -->
         <DataTemplate x:Key="FlattenedLeafTemplate" DataType="{x:Type models:JsonTreeItem}">
-            <StackPanel Orientation="Horizontal" Margin="2" Width="Auto">
-                <Border Background="Red" Margin="0,0,5,0" Width="5" />
+            <WrapPanel Orientation="Vertical" Margin="0" Width="Auto">
+                <Border Background="Red" Margin="0,0,2,0"  Width="5" Padding="0"/>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -234,16 +251,21 @@
                     </Grid.ColumnDefinitions>
 
                     <!-- Show the parent's key, a dot separator, then the child's key -->
-                    <TextBlock Text="{Binding Key, StringFormat={}{0} :}" FontWeight="Bold" MinWidth="150" Grid.Column="0" Style="{StaticResource LeftAlignTextBlock}" />
+                    <TextBlock Text="{Binding Key, StringFormat={}{0} :}" 
+                               FontWeight="Bold" 
+                               Grid.Column="0" 
+                               Style="{StaticResource LeftAlignTextBlock}" />
 
                     <!-- Editable TextBox for the child's value -->
                     <TextBox Text="{Binding Children[0].Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                     Style="{StaticResource EditorTextBox}"
-                     IsReadOnly="{Binding DataContext.IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBooleanConverter}}" 
-                     AcceptsReturn="True" TextWrapping="Wrap"
-                     Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" MinHeight="30"/>
+                             Style="{StaticResource EditorTextBox}"
+                             IsReadOnly="{Binding DataContext.IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBooleanConverter}}" 
+                             AcceptsReturn="True" 
+                             TextWrapping="Wrap"
+                             Grid.Column="1" 
+                             HorizontalAlignment="Stretch" />
                 </Grid>
-            </StackPanel>
+            </WrapPanel>
         </DataTemplate>
 
         <!-- Instantiate the DataTemplateSelector and wire up the three templates -->
@@ -264,35 +286,44 @@
         </Grid.ColumnDefinitions>
 
         <!-- Top panel: File path and edit toggle -->
-        <StackPanel Orientation="Horizontal" Margin="5" Grid.Column="0">
-            <TextBlock Text="File Path:" VerticalAlignment="Center" Style="{StaticResource StyledTextBlock}"/>
-            <TextBlock Text="{Binding FilePath, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                     Margin="5,0,0,0" Width="300" Style="{StaticResource StyledTextBlock}"/>
-            <!--<CheckBox Content="Editable" IsChecked="{Binding IsEditable, Mode=TwoWay}" Margin="10,0,0,0"/>-->
-            <ToggleButton Content="Editable" IsChecked="{Binding IsEditable, Mode=TwoWay}" Margin="10,0,0,0" Style="{StaticResource ModernToggleButton}" Tag="&#xf204;"/>
+        <DockPanel>
+            <StackPanel Orientation="Horizontal" Margin="5" Grid.Column="0" DockPanel.Dock="Left" HorizontalAlignment="Stretch">
+                <TextBlock Text="File Path:" VerticalAlignment="Center" Style="{StaticResource StyledTextBlock}"/>
+                <TextBlock Text="{Binding FilePath, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="5,0,0,0" MinWidth="100" Style="{StaticResource StyledTextBlock}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="5" Grid.Column="0" HorizontalAlignment="Stretch">
+                <TextBlock Text="Loading..." 
+                            Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" 
+                            VerticalAlignment="Center" Margin="10,0,0,0"/>
+                <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="5" Grid.Column="0" DockPanel.Dock="Right" HorizontalAlignment="Right">
+                <Button Style="{StaticResource FolderOpenButtonStyle}" Command="{Binding LoadCommand}" />
+                <Button Style="{StaticResource SaveButtonStyle}" Command="{Binding SaveCommand}" Margin="5,0,0,0" />
+                
+                <!--<CheckBox Content="Editable" IsChecked="{Binding IsEditable, Mode=TwoWay}" Margin="10,0,0,0"/>-->
+                <ToggleButton Content="Editable" IsChecked="{Binding IsEditable, Mode=TwoWay}" Margin="10,0,0,0" Style="{StaticResource ModernToggleButton}" Tag="&#xf204;"/>
 
-            <Button Style="{StaticResource FolderOpenButtonStyle}" Command="{Binding LoadCommand}" />
-            <Button Style="{StaticResource SaveButtonStyle}" Command="{Binding SaveCommand}" Margin="5,0,0,0" />
-            <TextBlock Text="Loading..." 
-                        Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" 
-                        VerticalAlignment="Center" Margin="10,0,0,0"/>
-            <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" VerticalAlignment="Center" Margin="10,0,0,0"/>
-        </StackPanel>
-
+            </StackPanel>
+        </DockPanel>
         <!-- Middle panel: JSON TreeView within a ScrollViewer -->
-        <Border Grid.Row="1" Grid.Column="0" Margin="5" BorderBrush="Gray" BorderThickness="1" HorizontalAlignment="Stretch">
-            <ScrollViewer HorizontalAlignment="Stretch" HorizontalScrollBarVisibility="Disabled">
-                <TreeView ItemsSource="{Binding JsonTreeItems}" ScrollViewer.CanContentScroll="False"
-                          ItemTemplateSelector="{StaticResource JsonTreeItemTemplateSelector}" HorizontalAlignment="Stretch" Width="Auto">
+        <Border Grid.Row="1" Grid.Column="0" Margin="5" BorderBrush="Gray" BorderThickness="0" HorizontalAlignment="Stretch">
+            <!--<ScrollViewer HorizontalAlignment="Stretch" HorizontalScrollBarVisibility="Disabled">-->
+                <TreeView ItemsSource="{Binding JsonTreeItems}" 
+                          ScrollViewer.CanContentScroll="False"
+                          ItemTemplateSelector="{StaticResource JsonTreeItemTemplateSelector}" 
+                          HorizontalAlignment="Stretch" 
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                     <TreeView.ItemContainerStyle>
                         <Style TargetType="TreeViewItem">
                             <Setter Property="IsExpanded" Value="True"/>
                             <Setter Property="Padding" Value="5"/>
-                            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                         </Style>
                     </TreeView.ItemContainerStyle>
                 </TreeView>
-            </ScrollViewer>
+            <!--</ScrollViewer>-->
         </Border>
     </Grid>
 </UserControl>
