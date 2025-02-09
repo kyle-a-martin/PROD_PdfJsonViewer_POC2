@@ -5,35 +5,84 @@
                     xmlns:converters="clr-namespace:PROD_PdfJsonViewer_POC.UserControls.Converters"
                     xmlns:helper="clr-namespace:PROD_PdfJsonViewer_POC.UserControls.Helper">
 
-    <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+    <!-- Built-in converters -->
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-        <!-- DataTemplate for leaf nodes (values) -->
-        <DataTemplate x:Key="JsonLeafTemplate" DataType="{x:Type models:JsonTreeItem}">
-            <StackPanel Orientation="Horizontal" Margin="2">
-                <TextBlock Text="{Binding Key}" FontWeight="Bold" Margin="0,0,5,0"/>
-                <TextBlock Text=": " />
-                <!-- Editable TextBox -->
+    <!-- Inverse of BooleanToVisibilityConverter -->
+    <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+    <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+    <converters:FilePathToFileNameConverter x:Key="FilePathToFileNameConverter" />
+
+
+    <!-- DataTemplate for leaf nodes (simple key/value pairs) -->
+    <DataTemplate x:Key="JsonLeafTemplate" DataType="{x:Type models:JsonTreeItem}">
+        <WrapPanel Orientation="Vertical" Margin="2">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding Key, StringFormat={}{0} -}" FontWeight="Bold" Margin="0,0,2,0" Grid.Column="0"/>
+                <!-- Editable TextBox for values -->
                 <TextBox Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                         Visibility="{Binding DataContext.IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}"
-                         AcceptsReturn="True" TextWrapping="Wrap" MinHeight="30" Margin="5,0,0,0" Width="200"/>
-                <!-- Read-only TextBlock -->
-                <TextBlock Text="{Binding Value}" 
-                           Visibility="{Binding DataContext.IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
-                           TextWrapping="Wrap" MinHeight="30" Margin="5,0,0,0" Width="200"/>
-            </StackPanel>
-        </DataTemplate>
+                     Style="{DynamicResource EditorTextBox}"
+                     IsReadOnly="{Binding DataContext.IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBooleanConverter}}"  
+                     AcceptsReturn="True" 
+                     TextWrapping="Wrap" 
+                     Grid.Column="1" 
+                     HorizontalAlignment="Stretch"/>
+            </Grid>
+        </WrapPanel>
+    </DataTemplate>
 
-        <!-- HierarchicalDataTemplate for group nodes (objects/arrays) -->
-        <HierarchicalDataTemplate x:Key="JsonBranchTemplate" DataType="{x:Type models:JsonTreeItem}" ItemsSource="{Binding Children}">
-            <StackPanel Orientation="Horizontal" Margin="2">
-                <TextBlock Text="{Binding Key}" FontWeight="Bold" Margin="0,0,5,0"/>
-                <!-- Optionally add a label such as (Group) if desired -->
-                <TextBlock Text="(Group)" Foreground="Gray" Margin="0,0,5,0"/>
-            </StackPanel>
-        </HierarchicalDataTemplate>
+    <!-- HierarchicalDataTemplate for group nodes with multiple children -->
+    <HierarchicalDataTemplate x:Key="JsonGroupTemplate" DataType="{x:Type models:JsonTreeItem}" ItemsSource="{Binding Children}">
+        <StackPanel Orientation="Horizontal" Margin="0">
+            <Border Background="Gray" Margin="0,0,2,0" Width="5"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-    <!--<helper:JsonTreeItemTemplateSelector x:Key="JsonTreeItemTemplateSelector"
-                                            LeafTemplate="{StaticResource JsonLeafTemplate}"
-                                            BranchTemplate="{StaticResource JsonBranchTemplate}" />-->
+                <!-- Show the parent's key, a dot separator, then the child's key -->
+                <TextBlock Text="{Binding Key}" FontWeight="Bold"  Padding="5" Margin="0,0,2,0" Grid.Column="0" Style="{DynamicResource LeftAlignTextBlock}"/>
+                <!-- Optional group indicator -->
+                <!--<TextBlock Text="(Group)" Foreground="Gray" Margin="0,0,5,0" Grid.Column="0"/>-->
+            </Grid>
+        </StackPanel>
+    </HierarchicalDataTemplate>
+
+    <!-- DataTemplate for flattened nodes: groups that have one child that is a leaf -->
+    <DataTemplate x:Key="FlattenedLeafTemplate" DataType="{x:Type models:JsonTreeItem}">
+        <WrapPanel Orientation="Vertical" Margin="0" Width="Auto">
+            <Border Background="Red" Margin="0,0,2,0"  Width="5" Padding="0"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Show the parent's key, a dot separator, then the child's key -->
+                <TextBlock Text="{Binding Key, StringFormat={}{0} :}" 
+                       FontWeight="Bold" 
+                       Grid.Column="0" 
+                       Style="{DynamicResource LeftAlignTextBlock}" />
+
+                <!-- Editable TextBox for the child's value -->
+                <TextBox Text="{Binding Children[0].Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                     Style="{DynamicResource EditorTextBox}"
+                     IsReadOnly="{Binding DataContext.IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBooleanConverter}}" 
+                     AcceptsReturn="True" 
+                     TextWrapping="Wrap"
+                     Grid.Column="1" 
+                     HorizontalAlignment="Stretch" />
+            </Grid>
+        </WrapPanel>
+    </DataTemplate>
+
+    <!-- Instantiate the DataTemplateSelector and wire up the three templates -->
+    <helper:JsonTreeItemTemplateSelector x:Key="JsonTreeItemTemplateSelector"
+                              LeafTemplate="{StaticResource JsonLeafTemplate}"
+                              GroupTemplate="{StaticResource JsonGroupTemplate}"
+                              FlattenedLeafTemplate="{StaticResource FlattenedLeafTemplate}" />
 
 </ResourceDictionary>
