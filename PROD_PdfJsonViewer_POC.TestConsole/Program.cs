@@ -10,7 +10,7 @@ namespace PROD_PdfJsonViewer_POC.TestConsole
         {
             Console.WriteLine("JSON Editor Test Console");
 
-            var filePath = @"E:\Test Data\PDF_JSON_Viewer\33GRAF26A_IFB.json";
+            var filePath = @"E:\Test Data\PDF_JSON_Viewer\sample.json";
 
             var json = File.ReadAllText(filePath);
 

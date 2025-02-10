@@ -13,76 +13,137 @@
     <converters:FilePathToFileNameConverter x:Key="FilePathToFileNameConverter" />
 
 
-    <!-- DataTemplate for leaf nodes (simple key/value pairs) -->
-    <DataTemplate x:Key="JsonLeafTemplate" DataType="{x:Type models:JsonTreeItem}">
-        <WrapPanel Orientation="Vertical" Margin="2">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="{Binding Key, StringFormat={}{0} -}" FontWeight="Bold" Margin="0,0,2,0" Grid.Column="0"/>
-                <!-- Editable TextBox for values -->
-                <TextBox Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                     Style="{DynamicResource EditorTextBox}"
-                     IsReadOnly="{Binding DataContext.IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBooleanConverter}}"  
-                     AcceptsReturn="True" 
-                     TextWrapping="Wrap" 
-                     Grid.Column="1" 
-                     HorizontalAlignment="Stretch"/>
-            </Grid>
-        </WrapPanel>
-    </DataTemplate>
+    <!-- Branch Template -->
+    <HierarchicalDataTemplate x:Key="BranchTemplate" ItemsSource="{Binding Children}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-    <!-- HierarchicalDataTemplate for group nodes with multiple children -->
-    <HierarchicalDataTemplate x:Key="JsonGroupTemplate" DataType="{x:Type models:JsonTreeItem}" ItemsSource="{Binding Children}">
-        <StackPanel Orientation="Horizontal" Margin="0">
-            <Border Background="Gray" Margin="0,0,2,0" Width="5"/>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+            <Border Background="Transparent" BorderThickness="0" Padding="5" Margin="0,5">
+                <TextBlock Text="{Binding Key, StringFormat={}{0}:}" FontWeight="Bold" VerticalAlignment="Center" />
+            </Border>
 
-                <!-- Show the parent's key, a dot separator, then the child's key -->
-                <TextBlock Text="{Binding Key}" FontWeight="Bold"  Padding="5" Margin="0,0,2,0" Grid.Column="0" Style="{DynamicResource LeftAlignTextBlock}"/>
-                <!-- Optional group indicator -->
-                <!--<TextBlock Text="(Group)" Foreground="Gray" Margin="0,0,5,0" Grid.Column="0"/>-->
-            </Grid>
-        </StackPanel>
+            <ItemsPresenter Grid.Column="1" Margin="10,0,0,0" />
+        </Grid>
     </HierarchicalDataTemplate>
 
-    <!-- DataTemplate for flattened nodes: groups that have one child that is a leaf -->
-    <DataTemplate x:Key="FlattenedLeafTemplate" DataType="{x:Type models:JsonTreeItem}">
-        <WrapPanel Orientation="Vertical" Margin="0" Width="Auto">
-            <Border Background="Red" Margin="0,0,2,0"  Width="5" Padding="0"/>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+    <!-- Leaf Templates -->
+    <DataTemplate x:Key="StringTemplate">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-                <!-- Show the parent's key, a dot separator, then the child's key -->
-                <TextBlock Text="{Binding Key, StringFormat={}{0} :}" 
-                       FontWeight="Bold" 
-                       Grid.Column="0" 
-                       Style="{DynamicResource LeftAlignTextBlock}" />
-
-                <!-- Editable TextBox for the child's value -->
-                <TextBox Text="{Binding Children[0].Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                     Style="{DynamicResource EditorTextBox}"
-                     IsReadOnly="{Binding DataContext.IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBooleanConverter}}" 
-                     AcceptsReturn="True" 
-                     TextWrapping="Wrap"
-                     Grid.Column="1" 
-                     HorizontalAlignment="Stretch" />
-            </Grid>
-        </WrapPanel>
+            <TextBlock Text="{Binding Key, StringFormat={}{0}:}" FontWeight="Bold" VerticalAlignment="Center" Margin="5" />
+            <TextBox Grid.Column="1" Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="5" />
+        </Grid>
     </DataTemplate>
 
-    <!-- Instantiate the DataTemplateSelector and wire up the three templates -->
+    <DataTemplate x:Key="DateTimeTemplate">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="{Binding Key, StringFormat={}{0}:}" FontWeight="Bold" VerticalAlignment="Center" Margin="5" />
+            <DatePicker Grid.Column="1" SelectedDate="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="5" />
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="BooleanTemplate">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="{Binding Key, StringFormat={}{0}:}" FontWeight="Bold" VerticalAlignment="Center" Margin="5" />
+            <ToggleButton Grid.Column="1" IsChecked="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Content="{Binding Value}" Margin="5" />
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="DefaultTemplate">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="{Binding Key, StringFormat={}{0}:}" FontWeight="Bold" VerticalAlignment="Center" Margin="5" />
+            <TextBlock Grid.Column="1" Text="{Binding Value}" VerticalAlignment="Center" Margin="5" />
+        </Grid>
+    </DataTemplate>
+
     <helper:JsonTreeItemTemplateSelector x:Key="JsonTreeItemTemplateSelector"
-                              LeafTemplate="{StaticResource JsonLeafTemplate}"
-                              GroupTemplate="{StaticResource JsonGroupTemplate}"
-                              FlattenedLeafTemplate="{StaticResource FlattenedLeafTemplate}" />
+                                     BranchTemplate="{StaticResource BranchTemplate}"
+                                     StringTemplate="{StaticResource StringTemplate}"
+                                     DateTimeTemplate="{StaticResource DateTimeTemplate}"
+                                     BooleanTemplate="{StaticResource BooleanTemplate}"
+                                     DefaultTemplate="{StaticResource DefaultTemplate}" />
+
+
+    <!-- JSON Editor Item Template -->
+    <DataTemplate x:Key="JsonEditorItemTemplate">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Indentation -->
+            <Border Background="Transparent" BorderThickness="0" Padding="5,0" Margin="0,5">
+                <TextBlock Text="" FontSize="14" VerticalAlignment="Center" />
+            </Border>
+
+            <!-- Key and Value -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Key -->
+                <TextBlock Text="{Binding Key, StringFormat={}{0}:}" FontWeight="Bold" VerticalAlignment="Center" Margin="5" />
+
+                <!-- Value -->
+                <ContentPresenter Grid.Row="1" Content="{Binding}">
+                    <ContentPresenter.Resources>
+                        <!-- String Template -->
+                        <DataTemplate DataType="{x:Type models:JsonTreeItem}" x:Key="StringTemplate">
+                            <TextBox Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                                         MinHeight="30" Margin="5" />
+                        </DataTemplate>
+
+                        <!-- DateTime Template -->
+                        <DataTemplate DataType="{x:Type models:JsonTreeItem}" x:Key="DateTimeTemplate">
+                            <DatePicker SelectedDate="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="5" />
+                        </DataTemplate>
+
+                        <!-- Boolean Template -->
+                        <DataTemplate DataType="{x:Type models:JsonTreeItem}" x:Key="BooleanTemplate">
+                            <ToggleButton IsChecked="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              Content="{Binding Value}" Margin="5" />
+                        </DataTemplate>
+                    </ContentPresenter.Resources>
+                </ContentPresenter>
+            </Grid>
+        </Grid>
+    </DataTemplate>
+
+    <!-- JSON Editor Branch Template -->
+    <DataTemplate x:Key="JsonEditorBranchTemplate">
+        <ItemsControl ItemsSource="{Binding Children}" ItemTemplate="{StaticResource JsonEditorItemTemplate}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+    </DataTemplate>
 
 </ResourceDictionary>
