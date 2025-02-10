@@ -126,17 +126,16 @@ namespace PROD_PdfJsonViewer_POC.UserControls.ViewModels
         /// <summary>
         /// Recursively converts a JsonNode into a tree of JsonTreeItem objects.
         /// </summary>
-        private ObservableCollection<JsonTreeItem> GenerateTreeItems(JsonNode? node, string key = "")
+        private static ObservableCollection<JsonTreeItem> GenerateTreeItems(JsonNode? node, string key = "")
         {
             var items = new ObservableCollection<JsonTreeItem>();
-
             if (node is JsonObject obj)
             {
                 foreach (var property in obj)
                 {
                     var item = new JsonTreeItem { Key = property.Key };
                     var childItems = GenerateTreeItems(property.Value, property.Key);
-                    if (childItems.Count > 0)
+                    if (childItems.Count > 1)
                     {
                         foreach (var child in childItems)
                         {
@@ -145,7 +144,7 @@ namespace PROD_PdfJsonViewer_POC.UserControls.ViewModels
                     }
                     else
                     {
-                        item.Value = property.Value?.ToString();
+                        item.Value = property.Value as JsonValue;
                     }
                     items.Add(item);
                 }
@@ -157,7 +156,7 @@ namespace PROD_PdfJsonViewer_POC.UserControls.ViewModels
                 {
                     var item = new JsonTreeItem { Key = $"[{index}]" };
                     var childItems = GenerateTreeItems(element, index.ToString());
-                    if (childItems.Count > 0)
+                    if (childItems.Count > 1)
                     {
                         foreach (var child in childItems)
                         {
@@ -166,18 +165,17 @@ namespace PROD_PdfJsonViewer_POC.UserControls.ViewModels
                     }
                     else
                     {
-                        item.Value = element?.ToString();
+                        item.Value = element as JsonValue;
                     }
                     items.Add(item);
                     index++;
                 }
             }
-            else if (node != null)
+            else if (node is JsonValue value)
             {
                 // Leaf node.
-                items.Add(new JsonTreeItem { Key = key, Value = node.ToString() });
+                items.Add(new JsonTreeItem { Key = key, Value = value });
             }
-
             return items;
         }
     }

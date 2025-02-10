@@ -1,39 +1,164 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:fa="http://schemas.fontawesome.io/icons/"
                     xmlns:models="clr-namespace:PROD_PdfJsonViewer_POC.UserControls.Models"
                     xmlns:local="clr-namespace:PROD_PdfJsonViewer_POC.UserControls.Controls"
                     xmlns:converters="clr-namespace:PROD_PdfJsonViewer_POC.UserControls.Converters"
                     xmlns:helper="clr-namespace:PROD_PdfJsonViewer_POC.UserControls.Helper">
 
-    <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+    <!-- Built-in converters -->
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-        <!-- DataTemplate for leaf nodes (values) -->
-        <DataTemplate x:Key="JsonLeafTemplate" DataType="{x:Type models:JsonTreeItem}">
-            <StackPanel Orientation="Horizontal" Margin="2">
-                <TextBlock Text="{Binding Key}" FontWeight="Bold" Margin="0,0,5,0"/>
-                <TextBlock Text=": " />
-                <!-- Editable TextBox -->
-                <TextBox Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                         Visibility="{Binding DataContext.IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}"
-                         AcceptsReturn="True" TextWrapping="Wrap" MinHeight="30" Margin="5,0,0,0" Width="200"/>
-                <!-- Read-only TextBlock -->
-                <TextBlock Text="{Binding Value}" 
-                           Visibility="{Binding DataContext.IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
-                           TextWrapping="Wrap" MinHeight="30" Margin="5,0,0,0" Width="200"/>
-            </StackPanel>
-        </DataTemplate>
+    <!-- Inverse of BooleanToVisibilityConverter -->
+    <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+    <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+    <converters:FilePathToFileNameConverter x:Key="FilePathToFileNameConverter" />
+    <converters:JsonBooleanConverter x:Key="JsonBooleanConverter" />
+    <converters:JsonBooleanToStringConverter x:Key="JsonBooleanToStringConverter" />
 
-        <!-- HierarchicalDataTemplate for group nodes (objects/arrays) -->
-        <HierarchicalDataTemplate x:Key="JsonBranchTemplate" DataType="{x:Type models:JsonTreeItem}" ItemsSource="{Binding Children}">
-            <StackPanel Orientation="Horizontal" Margin="2">
-                <TextBlock Text="{Binding Key}" FontWeight="Bold" Margin="0,0,5,0"/>
-                <!-- Optionally add a label such as (Group) if desired -->
-                <TextBlock Text="(Group)" Foreground="Gray" Margin="0,0,5,0"/>
-            </StackPanel>
-        </HierarchicalDataTemplate>
 
-    <!--<helper:JsonTreeItemTemplateSelector x:Key="JsonTreeItemTemplateSelector"
-                                            LeafTemplate="{StaticResource JsonLeafTemplate}"
-                                            BranchTemplate="{StaticResource JsonBranchTemplate}" />-->
+    <!-- Branch Template -->
+    <HierarchicalDataTemplate x:Key="BranchTemplate" ItemsSource="{Binding Children}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Background="Transparent" BorderThickness="0" Padding="2" Margin="0">
+                <TextBlock Text="{Binding Key, StringFormat={}{0}(Branch):}" FontWeight="Bold" VerticalAlignment="Center" Margin ="2" FontSize="16"/>
+            </Border>
+            
+            <ItemsPresenter Grid.Column="1" Margin="0,0,0,0" />
+        </Grid>
+    </HierarchicalDataTemplate>
+
+    <!-- Leaf Templates -->
+    <DataTemplate x:Key="StringTemplate">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="{Binding Key, StringFormat={}{0}(String):}" FontWeight="Bold" VerticalAlignment="Top" Margin="10,2,2,2" FontSize="14" />
+            <TextBox Grid.Column="1" Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                     Margin="5" 
+                     Style="{DynamicResource EditorTextBox}"
+                     IsReadOnly="{Binding DataContext.IsEditable, Converter={StaticResource InverseBooleanConverter}, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="DateTimeTemplate">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="{Binding Key, StringFormat={}{0}(DateTime):}" FontWeight="Bold" VerticalAlignment="Center" Margin="10,2,2,2" />
+            <DatePicker Grid.Column="1" 
+                        SelectedDate="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                        Margin="2" />
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="BooleanTemplate">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="{Binding Key, StringFormat={}{0}(Boolean):}" FontWeight="Bold" VerticalAlignment="Center" Margin="10,2,2,2" Style="{StaticResource StyledTextBlock}"/>
+            <ToggleButton Grid.Column="1" 
+                          IsChecked="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource JsonBooleanConverter}}" 
+                          Content="{Binding Value, Converter={StaticResource JsonBooleanToStringConverter}}" 
+                          Margin="2" 
+                          Style="{DynamicResource ModernToggleButton}"/>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="DefaultTemplate">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="{Binding Key, StringFormat={}{0}(Default):}" FontWeight="Bold" VerticalAlignment="Center" Margin="10,2,2,2" />
+            <TextBlock Grid.Column="1" 
+                       Text="{Binding Value}" 
+                       VerticalAlignment="Top" 
+                       Margin="2"/>
+        </Grid>
+    </DataTemplate>
+
+    <helper:JsonTreeItemTemplateSelector x:Key="JsonTreeItemTemplateSelector"
+                                     BranchTemplate="{StaticResource BranchTemplate}"
+                                     StringTemplate="{StaticResource StringTemplate}"
+                                     DateTimeTemplate="{StaticResource DateTimeTemplate}"
+                                     BooleanTemplate="{StaticResource BooleanTemplate}"
+                                     DefaultTemplate="{StaticResource DefaultTemplate}" />
+
+
+    <!-- JSON Editor Item Template -->
+    <DataTemplate x:Key="JsonEditorItemTemplate">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Indentation -->
+            <Border Background="Transparent" BorderThickness="0" Padding="5,0" Margin="0,5">
+                <TextBlock Text="" FontSize="14" VerticalAlignment="Center" />
+            </Border>
+
+            <!-- Key and Value -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Key -->
+                <TextBlock Text="{Binding Key, StringFormat={}{0}:}" FontWeight="Bold" VerticalAlignment="Center" Margin="5" />
+
+                <!-- Value -->
+                <ContentPresenter Grid.Row="1" Content="{Binding}">
+                    <ContentPresenter.Resources>
+                        <!-- String Template -->
+                        <DataTemplate DataType="{x:Type models:JsonTreeItem}" x:Key="StringTemplate">
+                            <TextBox Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                                         MinHeight="30" Margin="5" />
+                        </DataTemplate>
+
+                        <!-- DateTime Template -->
+                        <DataTemplate DataType="{x:Type models:JsonTreeItem}" x:Key="DateTimeTemplate">
+                            <DatePicker SelectedDate="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="5" />
+                        </DataTemplate>
+
+                        <!-- Boolean Template -->
+                        <DataTemplate DataType="{x:Type models:JsonTreeItem}" x:Key="BooleanTemplate">
+                            <ToggleButton IsChecked="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              Content="{Binding Value}" Margin="5" />
+                        </DataTemplate>
+                    </ContentPresenter.Resources>
+                </ContentPresenter>
+            </Grid>
+        </Grid>
+    </DataTemplate>
+
+    <!-- JSON Editor Branch Template -->
+    <DataTemplate x:Key="JsonEditorBranchTemplate">
+        <ItemsControl ItemsSource="{Binding Children}" ItemTemplate="{StaticResource JsonEditorItemTemplate}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+    </DataTemplate>
 
 </ResourceDictionary>

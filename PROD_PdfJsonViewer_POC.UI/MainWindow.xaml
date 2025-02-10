@@ -11,13 +11,13 @@
         xmlns:jsoneditor="clr-namespace:PROD_PdfJsonViewer_POC.UserControls.Controls;assembly=PROD_PdfJsonViewer_POC.UserControls"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel, IsDesignTimeCreatable=True}"
-        Title="DataBank - JSON Validator" Height="675" Width="1200">
+        Title="{Binding FolderPath, StringFormat='DataBank - JSON Validator - {0}'}" Height="675" Width="1200">
     <Window.Resources>
         <helper:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
         <helper:PathToFilenameConverter x:Key="PathToFilenameConverter" />
     </Window.Resources>
-    <DockPanel>
-        <ToolBar DockPanel.Dock="Top" VerticalAlignment="Top">
+    <DockPanel Background="LightGray">
+        <ToolBar DockPanel.Dock="Top" VerticalAlignment="Top" Padding="0, 5, 0, 5">
             <ToolBarPanel VerticalAlignment="Top" Orientation="Horizontal" Width="Auto">
                 <Button x:Name="OpenFileButton" Style="{StaticResource FolderOpenButtonStyle}" Padding="5 0"  
                         Height="30"  Command="{Binding OpenPdfFileCommand}" />
@@ -35,19 +35,35 @@
                         Command="{Binding NextPdfCommand}" Margin="10 0"/>
             </ToolBarPanel>
         </ToolBar>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="615*"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="650*"/>
-                <ColumnDefinition Width="650*"/>
-            </Grid.ColumnDefinitions>
-            <!-- PDF Viewer on the left -->
-            <WebBrowser x:Name="PdfViewer" Grid.Column="0" Grid.Row="0" MinHeight="600" 
-                        Height="Auto" MinWidth="600" HorizontalAlignment="Left" VerticalAlignment="Stretch"/>
-            <!-- JSON Editor control on the right -->
-            <jsoneditor:JsonEditorControl x:Name="JsonEditor" FilePath="{Binding DataContext.RelatedJsonFile, RelativeSource={RelativeSource AncestorType=Window}}" Height="Auto" Width="Auto" Grid.Column="1" Grid.Row="0"/>
-        </Grid>
-    </DockPanel>
+        <!--<DockPanel >
+            --><!-- Navigation and Validation Panel --><!--
+            <Expander x:Name="NavPanelExpander" DockPanel.Dock="Left" Header="Validation" Width="200" 
+                      IsExpanded="{Binding IsNavPanelExpanded, Mode=TwoWay}">
+                <StackPanel>
+                    <ToggleButton Content="Pin" IsChecked="{Binding IsNavPanelPinned}" />
+                    <ListBox ItemsSource="{Binding PdfFiles}" SelectedItem="{Binding SelectedPdfFile}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding FileName}" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+            </Expander>-->
+        
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="615*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <!-- PDF Viewer on the left -->
+                <WebBrowser x:Name="PdfViewer" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5"/>
+                <!-- JSON Editor control on the right -->
+                <jsoneditor:JsonEditorControl x:Name="JsonEditor" FilePath="{Binding DataContext.RelatedJsonFile, RelativeSource={RelativeSource AncestorType=Window}}" Grid.Column="1" Grid.Row="0" Margin="5,5,5,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="White"/>
+            </Grid>
+        </DockPanel>
+    <!--</DockPanel>-->
 </Window>
