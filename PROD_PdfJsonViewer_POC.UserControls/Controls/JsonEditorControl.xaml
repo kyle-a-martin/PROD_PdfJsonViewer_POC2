@@ -14,7 +14,7 @@
 
     <UserControl.Resources>
         
-
+        <!-- Merged resource dictionaries -->
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Themes/CustomStyles.xaml" />
