@@ -13,15 +13,12 @@
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
-        
         <!-- Merged resource dictionaries -->
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Themes/CustomStyles.xaml" />
                 <ResourceDictionary Source="../Themes/JsonTreeItemTemplates.xaml" />
             </ResourceDictionary.MergedDictionaries>
-
-            
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -57,6 +54,7 @@
 
             </StackPanel>
         </DockPanel>
+        
         <!-- Middle panel: JSON TreeView within a ScrollViewer -->
         <Border Grid.Row="1" Grid.Column="0" Margin="5" BorderBrush="Gray" BorderThickness="0" HorizontalAlignment="Stretch">
             <ScrollViewer HorizontalAlignment="Stretch" HorizontalScrollBarVisibility="Disabled">
@@ -72,13 +70,10 @@
                             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                         </Style>
                     </TreeView.ItemContainerStyle>-->
-                    
+
                 </TreeView>
             </ScrollViewer>
         </Border>
-
-        <!--<ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-            <ContentControl Content="{Binding JsonTreeItems}" ContentTemplate="{StaticResource JsonEditorBranchTemplate}" />
-        </ScrollViewer>-->
+        
     </Grid>
 </UserControl>
