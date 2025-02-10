@@ -1,4 +1,5 @@
 ﻿using PROD_PdfJsonViewer_POC.UserControls.Models;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,16 +24,25 @@ namespace PROD_PdfJsonViewer_POC.UserControls.Helper
                 }
                 else
                 {
-                    switch (jsonTreeItem.Value)
+                    // TODO: need to implement a corrected check for data type in the value of the JsonTreeItem
+                    if (jsonTreeItem.Value is JsonValue jsonValue)
                     {
-                        case string _:
-                            return StringTemplate;
-                        case DateTime _:
-                            return DateTimeTemplate;
-                        case bool _:
-                            return BooleanTemplate;
-                        default:
-                            return DefaultTemplate;
+                        switch (jsonValue.GetValueKind())
+                        {
+                            case JsonValueKind.String:
+                                return StringTemplate;
+                            case JsonValueKind.Number:
+                                if (jsonValue.TryGetValue(out DateTime dateTime))
+                                {
+                                    return DateTimeTemplate;
+                                }
+                                return StringTemplate;
+                            case JsonValueKind.True or JsonValueKind.False:
+                                return BooleanTemplate;
+                            default:
+                                return DefaultTemplate;
+                        }
+
                     }
                 }
             }

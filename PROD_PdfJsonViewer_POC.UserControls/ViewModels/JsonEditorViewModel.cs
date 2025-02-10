@@ -135,7 +135,7 @@ namespace PROD_PdfJsonViewer_POC.UserControls.ViewModels
                 {
                     var item = new JsonTreeItem { Key = property.Key };
                     var childItems = GenerateTreeItems(property.Value, property.Key);
-                    if (childItems.Count > 0)
+                    if (childItems.Count > 1)
                     {
                         foreach (var child in childItems)
                         {
@@ -156,7 +156,7 @@ namespace PROD_PdfJsonViewer_POC.UserControls.ViewModels
                 {
                     var item = new JsonTreeItem { Key = $"[{index}]" };
                     var childItems = GenerateTreeItems(element, index.ToString());
-                    if (childItems.Count > 0)
+                    if (childItems.Count > 1)
                     {
                         foreach (var child in childItems)
                         {

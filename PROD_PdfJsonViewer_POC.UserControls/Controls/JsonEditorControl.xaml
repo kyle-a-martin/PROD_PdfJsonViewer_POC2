@@ -61,17 +61,18 @@
         <Border Grid.Row="1" Grid.Column="0" Margin="5" BorderBrush="Gray" BorderThickness="0" HorizontalAlignment="Stretch">
             <ScrollViewer HorizontalAlignment="Stretch" HorizontalScrollBarVisibility="Disabled">
                 <TreeView ItemsSource="{Binding JsonTreeItems}" 
-                          ScrollViewer.CanContentScroll="False"
                           ItemTemplateSelector="{StaticResource JsonTreeItemTemplateSelector}" 
                           HorizontalAlignment="Stretch" 
-                          ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                    <TreeView.ItemContainerStyle>
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                          ItemContainerStyle="{StaticResource {x:Type TreeViewItem}}">
+                    <!--<TreeView.ItemContainerStyle>
                         <Style TargetType="TreeViewItem">
                             <Setter Property="IsExpanded" Value="True"/>
                             <Setter Property="Padding" Value="5"/>
                             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                         </Style>
-                    </TreeView.ItemContainerStyle>
+                    </TreeView.ItemContainerStyle>-->
+                    
                 </TreeView>
             </ScrollViewer>
         </Border>
