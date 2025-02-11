@@ -8,13 +8,14 @@
         xmlns:helper="clr-namespace:PROD_PdfJsonViewer_POC.UI.Helper"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         xmlns:vm="clr-namespace:PROD_PdfJsonViewer_POC.UI.ViewModel"
-        xmlns:jsoneditor="clr-namespace:PROD_PdfJsonViewer_POC.UserControls.Controls;assembly=PROD_PdfJsonViewer_POC.UserControls"
+        xmlns:jsoncontrols="clr-namespace:PROD_PdfJsonViewer_POC.UserControls.Controls;assembly=PROD_PdfJsonViewer_POC.UserControls"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel, IsDesignTimeCreatable=True}"
         Title="{Binding FolderPath, StringFormat='DataBank - JSON Validator - {0}'}" Height="675" Width="1200">
     <Window.Resources>
         <helper:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
         <helper:PathToFilenameConverter x:Key="PathToFilenameConverter" />
+        <helper:FilePathToFileNameConverter x:Key="FilePathToFileNameConverter" />
     </Window.Resources>
     <DockPanel Background="LightGray">
         <ToolBar DockPanel.Dock="Top" VerticalAlignment="Top" Padding="0, 5, 0, 5">
@@ -25,7 +26,7 @@
                 <ComboBox x:Name="PdfFilesComboBox" ItemsSource="{Binding PdfFiles}" SelectedItem="{Binding SelectedPdfFile}" MinWidth="250">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding FileName}" Style="{StaticResource CenteredComboBoxTextBlock}" />
+                            <TextBlock Text="{Binding FilePath, Converter={StaticResource FilePathToFileNameConverter}}" Style="{StaticResource CenteredComboBoxTextBlock}" />
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
@@ -50,6 +51,14 @@
                     </ListBox>
                 </StackPanel>
             </Expander>-->
+            
+            <jsoncontrols:ValidationPanelControl IsExpanded="{Binding DataContext.ValidationIsExpanded, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                                 IsPinned="{Binding DataContext.ValidationIsPinned, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                 Files="{Binding DataContext.PdfFiles, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                 SelectedFile="{Binding DataContext.SelectedPdfFile, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                 x:Name="ValidationPanel" 
+                                                 Margin="5,5,5,5" 
+                                                 Background="White"/>
         
             <Grid>
                 <Grid.RowDefinitions>
@@ -59,10 +68,18 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
+                
                 <!-- PDF Viewer on the left -->
-                <WebBrowser x:Name="PdfViewer" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5"/>
+                <WebBrowser x:Name="PdfViewer" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5" />
                 <!-- JSON Editor control on the right -->
-                <jsoneditor:JsonEditorControl x:Name="JsonEditor" FilePath="{Binding DataContext.RelatedJsonFile, RelativeSource={RelativeSource AncestorType=Window}}" Grid.Column="1" Grid.Row="0" Margin="5,5,5,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="White"/>
+                <jsoncontrols:JsonEditorControl x:Name="JsonEditor" 
+                                                FilePath="{Binding DataContext.RelatedJsonFile, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                                Grid.Column="1" 
+                                                Grid.Row="0" 
+                                                Margin="5,5,5,5" 
+                                                HorizontalAlignment="Stretch"
+                                                VerticalAlignment="Stretch" 
+                                                Background="White"/>
             </Grid>
         </DockPanel>
     <!--</DockPanel>-->

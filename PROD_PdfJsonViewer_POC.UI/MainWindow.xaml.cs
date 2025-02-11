@@ -28,5 +28,14 @@ namespace PROD_PdfJsonViewer_POC.UI
                 PdfViewer.Navigate(vm.PdfSource);
             }
         }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            if (DataContext is MainWindowViewModel vm)
+            {
+                vm.PropertyChanged -= ViewModel_PropertyChanged;
+            }
+            base.OnClosed(e);
+        }
     }
 }
