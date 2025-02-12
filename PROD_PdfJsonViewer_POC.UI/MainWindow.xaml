@@ -62,13 +62,21 @@
             </Grid.ColumnDefinitions>
             <jsoncontrols:ValidationPanelControl IsExpanded="{Binding DataContext.ValidationIsExpanded, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=Window}}" 
                                                      IsPinned="{Binding DataContext.ValidationIsPinned, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                     Files="{Binding DataContext.PdfFiles, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                     SelectedFile="{Binding DataContext.SelectedPdfFile, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}"
+                                                     Files="{Binding DataContext.PdfFiles, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                     SelectedFile="{Binding DataContext.SelectedPdfFile, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=Window}}"
                                                      x:Name="ValidationPanel" 
                                                      Margin="5,5,5,5" 
                                                      Background="White"
                                                      Grid.Column="0" />
-            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"/>
+            <GridSplitter Grid.Column="1" 
+                          Grid.Row="0"
+                          Width="5" 
+                          HorizontalAlignment="Stretch"
+                          RenderOptions.BitmapScalingMode="HighQuality"
+                          SnapsToDevicePixels="True"
+                          IsTabStop="False"
+                          ResizeBehavior="PreviousAndNext"
+                          />
             <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="615*"/>
@@ -80,9 +88,19 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- PDF Viewer on the left -->
-                <WebBrowser x:Name="PdfViewer" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5" />
+                <!--<WebBrowser x:Name="PdfViewer" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5" />-->
+                <jsoncontrols:PdfViewerControl x:Name="PdfViewer" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5" FilePath="{Binding DataContext.SelectedPdfFile.FilePath, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                
                 <!-- Grid Splitter -->
-                <GridSplitter HorizontalAlignment="Stretch" Grid.Column="1" Grid.Row="0" Width="5"/>
+                <GridSplitter HorizontalAlignment="Stretch" 
+                              Grid.Column="1" 
+                              Grid.Row="0" 
+                              Width="5"
+                              RenderOptions.BitmapScalingMode="HighQuality"
+                              SnapsToDevicePixels="True"
+                              IsEnabled="False"
+                              ResizeBehavior="PreviousAndNext"/>
+                
                 <!-- JSON Editor control on the right -->
                 <jsoncontrols:JsonEditorControl x:Name="JsonEditor" 
                                                     FilePath="{Binding DataContext.RelatedJsonFile, RelativeSource={RelativeSource AncestorType=Window}}" 
@@ -92,7 +110,7 @@
                                                     HorizontalAlignment="Stretch"
                                                     VerticalAlignment="Stretch" 
                                                     Background="White"/>
-                <GridSplitter />
+                
             </Grid>
         </Grid>
     </DockPanel>

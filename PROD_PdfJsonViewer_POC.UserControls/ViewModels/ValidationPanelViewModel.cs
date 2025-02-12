@@ -32,7 +32,7 @@ namespace PROD_PdfJsonViewer_POC.UserControls.ViewModels
         private ObservableCollection<ContextFile> files = [];
 
         [ObservableProperty]
-        private ContextFile selectedFile = new();
+        private ContextFile selectedFile;
 
         [ObservableProperty]
         private string searchTerm = string.Empty;
@@ -61,17 +61,18 @@ namespace PROD_PdfJsonViewer_POC.UserControls.ViewModels
 
         partial void OnSelectedFileChanged(ContextFile? oldValue, ContextFile newValue)
         {
-            Debug.WriteLine("OnFilesChanged");
+            Debug.WriteLine("OnSelectedFileChanged");
             
             if (newValue is not null)
             {
-                Debug.WriteLine($"OnFilesChanged: {newValue.FilePath}");
+                Debug.WriteLine($"OnSelectedFileChanged: {newValue.FilePath}");
                 
                 if (newValue != oldValue)
                 {
                     Debug.WriteLine("OnFilesChanged: newValue != oldValue");
                     _currentDirectory = Path.GetDirectoryName(newValue.FilePath);
-                    Task.Run(async () => await SyncronizationWithJsonReport());
+                    Debug.WriteLine($"_currentDirectory: {_currentDirectory}");
+                    //Task.Run(async () => await SyncronizationWithJsonReport());
                 }
             }
         }

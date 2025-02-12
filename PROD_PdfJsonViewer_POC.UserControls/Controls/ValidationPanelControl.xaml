@@ -123,7 +123,6 @@
         </Grid.ColumnDefinitions>
 
         <!-- Collapsed Tab with smooth animation -->
-        <!-- Collapsed Tab -->
         <Grid Width="30">
             <!--Visibility="{Binding IsExpanded, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Inverse}">-->
             <ToggleButton Style="{StaticResource ModernToggleButtonStyle}"
@@ -163,7 +162,7 @@
                 </Grid.RowDefinitions>
 
                 <!-- Header -->
-                <Grid Background="#f8f9fa" 
+                <Grid Background="#f8f9fa" Grid.Row="0"
                       Height="48">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -248,7 +247,7 @@
 
                 <!-- File List -->
                 <ListView Grid.Row="2"
-                          ItemsSource="{Binding Files}"
+                          ItemsSource="{Binding Files, Mode=TwoWay}"
                           SelectedItem="{Binding SelectedFile, Mode=TwoWay}"
                           BorderThickness="0"
                           ItemContainerStyle="{StaticResource ModernListViewItem}"
@@ -275,8 +274,9 @@
                                 <StackPanel Grid.Column="1">
                                     <TextBlock  Text="{Binding FileName}" 
                                                 VerticalAlignment="Center"
+                                                HorizontalAlignment="Stretch"
                                                 TextTrimming="CharacterEllipsis"
-                                                MaxWidth="100"/>
+                                                MaxWidth="100" />
 
                                     <!-- Status Display -->
                                     <Grid Margin="0,4,0,0">
@@ -293,7 +293,7 @@
                                                         Margin="0,0,6,0"
                                                         FontSize="12"/>-->
 
-                                        <fa:FontAwesome>
+                                        <fa:FontAwesome Grid.Column="0">
                                             <fa:FontAwesome.Icon>
                                                 <Binding Path="ValidationStatus" Converter="{StaticResource ValidationStatusConverter}">
                                                     <Binding.ConverterParameter>Icon</Binding.ConverterParameter>
