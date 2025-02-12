@@ -37,7 +37,9 @@
             </ToolBarPanel>
         </ToolBar>
         <!--<DockPanel >
-            --><!-- Navigation and Validation Panel --><!--
+            -->
+        <!-- Navigation and Validation Panel -->
+        <!--
             <Expander x:Name="NavPanelExpander" DockPanel.Dock="Left" Header="Validation" Width="200" 
                       IsExpanded="{Binding IsNavPanelExpanded, Mode=TwoWay}">
                 <StackPanel>
@@ -51,36 +53,48 @@
                     </ListBox>
                 </StackPanel>
             </Expander>-->
-            
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
             <jsoncontrols:ValidationPanelControl IsExpanded="{Binding DataContext.ValidationIsExpanded, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                                 IsPinned="{Binding DataContext.ValidationIsPinned, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                 Files="{Binding DataContext.PdfFiles, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                 SelectedFile="{Binding DataContext.SelectedPdfFile, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                 x:Name="ValidationPanel" 
-                                                 Margin="5,5,5,5" 
-                                                 Background="White"/>
-        
-            <Grid>
+                                                     IsPinned="{Binding DataContext.ValidationIsPinned, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                     Files="{Binding DataContext.PdfFiles, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                     SelectedFile="{Binding DataContext.SelectedPdfFile, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}"
+                                                     x:Name="ValidationPanel" 
+                                                     Margin="5,5,5,5" 
+                                                     Background="White"
+                                                     Grid.Column="0" />
+            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"/>
+            <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="615*"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                
+
                 <!-- PDF Viewer on the left -->
                 <WebBrowser x:Name="PdfViewer" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5" />
+                <!-- Grid Splitter -->
+                <GridSplitter HorizontalAlignment="Stretch" Grid.Column="1" Grid.Row="0" Width="5"/>
                 <!-- JSON Editor control on the right -->
                 <jsoncontrols:JsonEditorControl x:Name="JsonEditor" 
-                                                FilePath="{Binding DataContext.RelatedJsonFile, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                                Grid.Column="1" 
-                                                Grid.Row="0" 
-                                                Margin="5,5,5,5" 
-                                                HorizontalAlignment="Stretch"
-                                                VerticalAlignment="Stretch" 
-                                                Background="White"/>
+                                                    FilePath="{Binding DataContext.RelatedJsonFile, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                                    Grid.Column="2" 
+                                                    Grid.Row="0" 
+                                                    Margin="5,5,5,5" 
+                                                    HorizontalAlignment="Stretch"
+                                                    VerticalAlignment="Stretch" 
+                                                    Background="White"/>
+                <GridSplitter />
             </Grid>
-        </DockPanel>
+        </Grid>
+    </DockPanel>
     <!--</DockPanel>-->
 </Window>

@@ -14,16 +14,24 @@ namespace PROD_PdfJsonViewer_POC.UserControls.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is not ValidationStatus status)
-            {
-                return PendingStatus;
-            }
+                return null;
 
-            return status switch
+            var statusDisplay = status switch
             {
                 ValidationStatus.Pending => PendingStatus,
                 ValidationStatus.Validated => ValidatedStatus,
                 ValidationStatus.Rejected => RejectedStatus,
                 _ => PendingStatus
+            };
+
+            // Return the specific property based on the parameter
+            return parameter?.ToString()?.ToLower() switch
+            {
+                "icon" => statusDisplay.Icon,
+                "color" => statusDisplay.Color,
+                "statustext" => statusDisplay.StatusText,
+                "textcolor" => statusDisplay.TextColor,
+                _ => null
             };
         }
 

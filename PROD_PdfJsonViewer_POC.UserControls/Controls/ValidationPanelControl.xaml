@@ -10,14 +10,14 @@
              xmlns:viewmodels="clr-namespace:PROD_PdfJsonViewer_POC.UserControls.ViewModels" 
              d:DataContext="{d:DesignInstance Type=viewmodels:ValidationPanelViewModel}"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="300">
+             d:DesignHeight="450" d:DesignWidth="150">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <converters:BooleanToColorConverter x:Key="BooleanToColorConverter" />
         <converters:ValidationStatusConverter x:Key="ValidationStatusConverter" />
         
         <!-- Modern Button Style -->
-        <Style x:Key="ModernButtonStyle" TargetType="Button">
+        <Style x:Key="ModernButtonStyle" TargetType="Button"> 
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="8"/>
@@ -68,6 +68,9 @@
                 <Trigger Property="IsChecked" Value="True">
                     <Setter Property="Background" Value="#e0e0e0"/>
                 </Trigger>
+                <Trigger Property="IsChecked" Value="False">
+                    <Setter Property="Width" Value="30"/>
+                </Trigger>
             </Style.Triggers>
         </Style>
 
@@ -99,6 +102,18 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!--  Animation  -->
+        <Storyboard x:Key="CollapseAnimation">
+            <DoubleAnimation Storyboard.TargetProperty="Width"
+                        From="300" To="30"
+                        Duration="0:0:0.2"/>
+        </Storyboard>
+        <Storyboard x:Key="ExpandAnimation">
+            <DoubleAnimation Storyboard.TargetProperty="Width"
+                        From="30" To="300"
+                        Duration="0:0:0.2"/>
+        </Storyboard>
     </UserControl.Resources>
 
     <Grid>
@@ -108,19 +123,22 @@
         </Grid.ColumnDefinitions>
 
         <!-- Collapsed Tab with smooth animation -->
-        <Grid Width="{Binding IsExpanded, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=inverse, FallbackValue=30}">
+        <!-- Collapsed Tab -->
+        <Grid Width="30">
+            <!--Visibility="{Binding IsExpanded, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Inverse}">-->
             <ToggleButton Style="{StaticResource ModernToggleButtonStyle}"
-                         IsChecked="{Binding IsExpanded, Mode=TwoWay}"
-                         Background="#f8f9fa">
+                     IsChecked="{Binding IsExpanded, Mode=TwoWay}"
+                     Background="#f8f9fa">
                 <StackPanel>
                     <fa:ImageAwesome Icon="File" 
-                                   VerticalAlignment="Center"
-                                   HorizontalAlignment="Center"
-                                   Foreground="#1976d2"/>
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               Foreground="#1976d2"
+                               Width="16"/>
                     <TextBlock Text="Files" 
-                             TextWrapping="Wrap"
-                             Margin="0,5,0,0"
-                             Foreground="#1976d2">
+                         TextWrapping="Wrap"
+                         Margin="0,5,0,0"
+                         Foreground="#1976d2">
                         <TextBlock.LayoutTransform>
                             <RotateTransform Angle="90"/>
                         </TextBlock.LayoutTransform>
@@ -131,12 +149,12 @@
 
         <!-- Expanded Panel -->
         <Border Grid.Column="1" 
-                Background="White"
-                BorderBrush="#e0e0e0" 
-                BorderThickness="1"
-                CornerRadius="4"
-                Margin="0,0,4,4"
-                Effect="{Binding IsExpanded, Converter={StaticResource BooleanToVisibilityConverter}}">
+            Background="White"
+            BorderBrush="#e0e0e0" 
+            BorderThickness="1"
+            CornerRadius="4"
+            Margin="0,0,4,4"
+            Visibility="{Binding IsExpanded, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Inverse}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -168,7 +186,6 @@
 
                     <ToggleButton Grid.Column="2"
                                 Style="{StaticResource ModernToggleButtonStyle}"
-                                Command="{Binding TogglePinCommand}"
                                 IsChecked="{Binding IsPinned, Mode=TwoWay}"
                                 ToolTip="Pin Panel"
                                 Margin="4,0">
@@ -250,16 +267,16 @@
 
                                 <!-- File Icon -->
                                 <fa:FontAwesome Icon="FilePdfOutline" 
-                        Margin="0,0,12,0"
-                        VerticalAlignment="Center"
-                        Foreground="#e53935"/>
+                                                Margin="0,0,12,0"
+                                                VerticalAlignment="Center"
+                                                Foreground="#e53935"/>
 
                                 <!-- File Details -->
                                 <StackPanel Grid.Column="1">
-                                    <TextBlock Text="{Binding FileName}" 
-                        VerticalAlignment="Center"
-                        TextTrimming="CharacterEllipsis"
-                                               MaxWidth="100"/>
+                                    <TextBlock  Text="{Binding FileName}" 
+                                                VerticalAlignment="Center"
+                                                TextTrimming="CharacterEllipsis"
+                                                MaxWidth="100"/>
 
                                     <!-- Status Display -->
                                     <Grid Margin="0,4,0,0">
@@ -268,18 +285,47 @@
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <fa:FontAwesome Icon="{Binding ValidationStatus, Converter={StaticResource ValidationStatusConverter}}"
+                                        <!--<fa:FontAwesome Icon="{ Binding ValidationStatus, 
+                                                                Converter={StaticResource ValidationStatusConverter}, 
+                                                                ConverterParameter=Icon}"
                                                         Foreground="{Binding ValidationStatus, 
-                                                                      Converter={StaticResource ValidationStatusConverter}}"
+                                                                      Converter={StaticResource ValidationStatusConverter}, ConverterParameter=Color}"
                                                         Margin="0,0,6,0"
-                                                        FontSize="12"/>
+                                                        FontSize="12"/>-->
 
-                                        <TextBlock Grid.Column="1"
+                                        <fa:FontAwesome>
+                                            <fa:FontAwesome.Icon>
+                                                <Binding Path="ValidationStatus" Converter="{StaticResource ValidationStatusConverter}">
+                                                    <Binding.ConverterParameter>Icon</Binding.ConverterParameter>
+                                                </Binding>
+                                            </fa:FontAwesome.Icon>
+                                            <fa:FontAwesome.Foreground>
+                                                <Binding Path="ValidationStatus" Converter="{StaticResource ValidationStatusConverter}">
+                                                        <Binding.ConverterParameter>Color</Binding.ConverterParameter>
+                                                </Binding>
+                                            </fa:FontAwesome.Foreground>
+                                        </fa:FontAwesome>
+
+                                        <!--<TextBlock Grid.Column="1"
                                                   Text="{Binding ValidationStatus, 
-                                                        Converter={StaticResource ValidationStatusConverter}, ConverterParameter=Text}"
+                                                        Converter={StaticResource ValidationStatusConverter}, ConverterParameter=StatusText}"
                                                   Foreground="{Binding ValidationStatus, 
-                                                             Converter={StaticResource ValidationStatusConverter}}"
-                                                  FontSize="12"/>
+                                                             Converter={StaticResource ValidationStatusConverter}, ConverterParameter=TextColor}"
+                                                  FontSize="12"/>-->
+                                        
+                                        <TextBlock Grid.Column="1" FontSize="12" Margin="6,0,0,0">
+                                            <TextBlock.Text>
+                                                <Binding Path="ValidationStatus" Converter="{StaticResource ValidationStatusConverter}">
+                                                    <Binding.ConverterParameter>StatusText</Binding.ConverterParameter>
+                                                </Binding>
+                                            </TextBlock.Text>
+                                            <TextBlock.Foreground>
+                                                <Binding Path="ValidationStatus" Converter="{StaticResource ValidationStatusConverter}">
+                                                    <Binding.ConverterParameter>TextColor</Binding.ConverterParameter>
+                                                </Binding>
+                                            </TextBlock.Foreground>
+                                        </TextBlock>
+
                                     </Grid>
                                 </StackPanel>
 
@@ -308,7 +354,7 @@
                                     </Button>
                                 </StackPanel>
 
-                                <!-- Remove Button -->
+                                <!-- Remove Button --><!--
                                 <Button Grid.Column="3"
                 Style="{StaticResource ModernButtonStyle}"
                 Command="{Binding DataContext.RemoveFileCommand, 
@@ -317,7 +363,7 @@
                 ToolTip="Remove File">
                                     <fa:FontAwesome Icon="Trash" 
                            Foreground="#757575"/>
-                                </Button>
+                                </Button>-->
                             </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>

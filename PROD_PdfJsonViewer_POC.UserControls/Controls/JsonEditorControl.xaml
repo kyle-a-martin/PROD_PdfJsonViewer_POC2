@@ -62,7 +62,7 @@
                           ItemTemplateSelector="{StaticResource JsonTreeItemTemplateSelector}" 
                           HorizontalAlignment="Stretch" 
                           ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                          ItemContainerStyle="{StaticResource {x:Type TreeViewItem}}">
+                          ItemContainerStyle="{StaticResource NoExpandTreeViewItem}">
                     <!--<TreeView.ItemContainerStyle>
                         <Style TargetType="TreeViewItem">
                             <Setter Property="IsExpanded" Value="True"/>

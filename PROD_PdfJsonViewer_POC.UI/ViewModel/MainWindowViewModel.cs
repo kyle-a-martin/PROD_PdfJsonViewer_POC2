@@ -69,9 +69,9 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
             };
             if (openFileDialog.ShowDialog() == true)
             {
-                SelectedPdfFile = new ContextFile(openFileDialog.SafeFileName, openFileDialog.FileName);
-                FolderPath = Path.GetDirectoryName(SelectedPdfFile.FilePath) ?? "File/Folder Not Found";
-                LoadLocalPdfFiles();
+                //SelectedPdfFile = new ContextFile(openFileDialog.SafeFileName, openFileDialog.FileName);
+                FolderPath = Path.GetDirectoryName(openFileDialog.FileName) ?? "File/Folder Not Found";
+                LoadLocalPdfFiles(openFileDialog.FileName);
                 LoadPdfToViewer();
             }
         }
@@ -95,7 +95,7 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
             Debug.WriteLine(PdfSource.ToString());
         }
 
-        private void LoadLocalPdfFiles()
+        private void LoadLocalPdfFiles(string selectedFilePath)
         {
             if (string.IsNullOrEmpty(FolderPath) || !Directory.Exists(FolderPath))
                 return;
@@ -108,7 +108,7 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
             }
 
             // Select the matching PDF file if it exists, or default to the first file.
-            int index = PdfFiles.ToList().FindIndex(f => f.FilePath == SelectedPdfFile?.FilePath);
+            int index = PdfFiles.ToList().FindIndex(f => f.FilePath == selectedFilePath);
             if (index >= 0 && index < PdfFiles.Count)
                 SelectedPdfFile = PdfFiles[index];
             else if (PdfFiles.Count > 0)
@@ -155,6 +155,14 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
             {
                 SelectedPdfFile = PdfFiles[0];
             }
+        }
+
+        
+        partial void OnSelectedPdfFileChanged(ContextFile value)
+        {
+            // TODO: Create Event handler for when the SelectedPdfFile property changes.
+            LoadPdfToViewer();
+            
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using PROD_PdfJsonViewer_POC.UserControls.Models;
+﻿using Microsoft.Extensions.Logging;
+using PROD_PdfJsonViewer_POC.UserControls.Models;
+using PROD_PdfJsonViewer_POC.UserControls.Services.Implementations;
 using PROD_PdfJsonViewer_POC.UserControls.ViewModels;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -12,6 +14,7 @@ namespace PROD_PdfJsonViewer_POC.UserControls.Controls
     /// </summary>
     public partial class ValidationPanelControl : UserControl
     {
+        
         public ValidationPanelControl()
         {
             InitializeComponent();
@@ -49,6 +52,7 @@ namespace PROD_PdfJsonViewer_POC.UserControls.Controls
                 typeof(ValidationPanelControl),
                 new FrameworkPropertyMetadata(
                     new ObservableCollection<ContextFile>(),
+                    FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
                     OnFilesChanged));
 
         public ObservableCollection<ContextFile> Files
@@ -62,8 +66,9 @@ namespace PROD_PdfJsonViewer_POC.UserControls.Controls
                 nameof(SelectedFile),
                 typeof(ContextFile), 
                 typeof(ValidationPanelControl), 
-                new PropertyMetadata(
+                new FrameworkPropertyMetadata(
                     new ContextFile(),
+                    FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
                     OnSelectedFileChanged));
 
         public ContextFile SelectedFile
