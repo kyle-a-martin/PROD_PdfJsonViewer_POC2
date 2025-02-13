@@ -8,8 +8,8 @@ namespace PROD_PdfJsonViewer_POC.UserControls.Models
 {
     public class ValidationReport
     {
-        public required string DirectoryPath { get; set; }
-        public required List<ContextFile> Files { get; set; }
+        public string DirectoryPath { get; set; }
+        public List<ContextFile> Files { get; set; }
         public DateTime LastUpdated { get; set; }
     }
 }

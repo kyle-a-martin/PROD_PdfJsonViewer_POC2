@@ -18,11 +18,11 @@ namespace PROD_PdfJsonViewer_POC.UserControls.Controls
         public ValidationPanelControl()
         {
             InitializeComponent();
+        }
 
-            if (!(DataContext is ValidationPanelViewModel))
-            {
-                DataContext = new ValidationPanelViewModel();
-            }
+        public void SetViewModel(ValidationPanelViewModel viewModel)
+        {
+            DataContext = viewModel;
         }
 
         #region Dependency Properties

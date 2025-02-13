@@ -1,16 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using PROD_PdfJsonViewer_POC.UserControls.Enums;
+using Microsoft.Extensions.Logging;
 using PROD_PdfJsonViewer_POC.UserControls.Models;
-using PROD_PdfJsonViewer_POC.UserControls.Services.Implementations;
 using PROD_PdfJsonViewer_POC.UserControls.Services.Interfaces;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows.Data;
-using System.IO;
-using System.Text.Json;
-using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using System.IO;
+using System.Windows.Data;
 
 namespace PROD_PdfJsonViewer_POC.UserControls.ViewModels
 {
@@ -18,39 +15,35 @@ namespace PROD_PdfJsonViewer_POC.UserControls.ViewModels
     {
         private readonly ICollectionView _filteredView;
         private readonly IJsonFileService _jsonFileService;
-        private ILogger<ValidationPanelViewModel> _logger;
-        private readonly string _jsonFilePath = "validation_report.json";
-        private string _currentDirectory;
-        
+        private readonly ILogger<ValidationPanelViewModel> _logger;
+        private const string JsonFilePath = "validation_report.json";
+        private string _currentDirectory = string.Empty;
+
         [ObservableProperty]
         private bool isPinned;
 
         [ObservableProperty]
-        private bool isExpanded;
+        private bool isExpanded = true;
 
         [ObservableProperty]
         private ObservableCollection<ContextFile> files = [];
 
         [ObservableProperty]
-        private ContextFile selectedFile;
+        private ContextFile? selectedFile;
 
         [ObservableProperty]
         private string searchTerm = string.Empty;
 
         public ICollectionView FilteredFiles => _filteredView;
 
-        public ValidationPanelViewModel()
+        public ValidationPanelViewModel(IJsonFileService jsonFileService, ILogger<ValidationPanelViewModel> logger)
         {
-            _logger = new Logger<ValidationPanelViewModel>(new LoggerFactory());
-            _jsonFileService = new JsonFileService(new Logger<JsonFileService>(new LoggerFactory()));
-            Files = new ObservableCollection<ContextFile>();
-            _filteredView = CollectionViewSource.GetDefaultView(Files);
+            _jsonFileService = jsonFileService ?? throw new ArgumentNullException(nameof(jsonFileService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _filteredView = CollectionViewSource.GetDefaultView(files);
             _filteredView.Filter = FilterPredicate;
-            _currentDirectory = string.Empty;
 
-            isExpanded = true;
-
-            this.PropertyChanged += (s, e) => 
+            PropertyChanged += (s, e) =>
             {
                 if (e.PropertyName == nameof(SearchTerm))
                 {
@@ -59,21 +52,12 @@ namespace PROD_PdfJsonViewer_POC.UserControls.ViewModels
             };
         }
 
-        partial void OnSelectedFileChanged(ContextFile? oldValue, ContextFile newValue)
+        partial void OnSelectedFileChanged(ContextFile? oldValue, ContextFile? newValue)
         {
-            Debug.WriteLine("OnSelectedFileChanged");
-            
-            if (newValue is not null)
+            if (newValue is not null && !string.IsNullOrEmpty(newValue.FilePath))
             {
-                Debug.WriteLine($"OnSelectedFileChanged: {newValue.FilePath}");
-                
-                if (newValue != oldValue)
-                {
-                    Debug.WriteLine("OnFilesChanged: newValue != oldValue");
-                    _currentDirectory = Path.GetDirectoryName(newValue.FilePath);
-                    Debug.WriteLine($"_currentDirectory: {_currentDirectory}");
-                    //Task.Run(async () => await SyncronizationWithJsonReport());
-                }
+                _currentDirectory = Path.GetDirectoryName(newValue.FilePath) ?? string.Empty;
+                Task.Run(async () => await SyncronizationWithJsonReport());
             }
         }
 
@@ -84,33 +68,27 @@ namespace PROD_PdfJsonViewer_POC.UserControls.ViewModels
 
         public async Task InitializeWithDirectoryAsync(string directoryPath)
         {
-            string reportPath = $"{directoryPath}";
-            
-            if (!Directory.Exists(reportPath))
+            if (!Directory.Exists(directoryPath))
             {
                 throw new DirectoryNotFoundException($"Directory Not Found: {directoryPath}");
             }
 
-            _currentDirectory = reportPath;
-
+            _currentDirectory = directoryPath;
             await SyncronizationWithJsonReport();
         }
 
         private async Task SyncronizationWithJsonReport()
         {
-            Debug.WriteLine("SyncronizationWithJsonReport");
-            
-            ValidationReport? report;
+            ValidationReport report;
 
             try
             {
-                // Load the validation report from the JSON file.
-                var json = await _jsonFileService.LoadJsonAsync($"{_currentDirectory}{_jsonFilePath}");
-                report = JsonSerializer.Deserialize<ValidationReport>(json);
+                report = await _jsonFileService.LoadJsonAsync<ValidationReport>($"{_currentDirectory}/{JsonFilePath}");
+                //report = JsonSerializer.Deserialize<ValidationReport>(json);
             }
-            catch (FileNotFoundException ex)
-            {   
-                report = new ValidationReport()
+            catch (FileNotFoundException)
+            {
+                report = new ValidationReport
                 {
                     DirectoryPath = _currentDirectory,
                     Files = new List<ContextFile>(),
@@ -118,44 +96,33 @@ namespace PROD_PdfJsonViewer_POC.UserControls.ViewModels
                 };
             }
 
-            // convert ObservableCollection<ContextFile> to List<ContextFile>
-            var currentFiles = Files.AsEnumerable().ToList();
-
-            var updatedEntries = new List<ContextFile>();
-
-            // Update report based on current file group supplied from main window.
-            foreach (var file in currentFiles)
+            var updatedEntries = Files.Select(file =>
             {
                 var existingEntry = report.Files.FirstOrDefault(f => f.FileName == file.FileName);
-                if (existingEntry != null)
+                if (file == existingEntry)
                 {
-                    updatedEntries.Add(existingEntry);
+                    return existingEntry;
                 }
-                else
-                {
-                    updatedEntries.Add(file);
-                }
-            }
+                return file;
+            }).ToList();
 
             report.Files = updatedEntries;
             report.LastUpdated = DateTime.Now;
 
-            var jsonReport = JsonSerializer.Serialize(report);
-            await _jsonFileService.SaveJsonAsync($"{_currentDirectory}/reports/{_jsonFilePath}", jsonReport);
+            //var jsonReport = JsonSerializer.Serialize(report);
+            await _jsonFileService.SaveJsonAsync($"{_currentDirectory}/{JsonFilePath}", report);
         }
 
         private bool FilterPredicate(object item)
         {
             if (string.IsNullOrWhiteSpace(SearchTerm))
-                return true;
-
-            if (item is ContextFile file)
             {
-                return file.FileName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-                       file.ValidationStatus.ToString().Contains(SearchTerm, StringComparison.OrdinalIgnoreCase);
+                return true;
             }
 
-            return false;
+            return item is ContextFile file &&
+                   (file.FileName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    file.ValidationStatus.ToString().Contains(SearchTerm, StringComparison.OrdinalIgnoreCase));
         }
 
         [RelayCommand]
@@ -167,25 +134,24 @@ namespace PROD_PdfJsonViewer_POC.UserControls.ViewModels
         [RelayCommand]
         private void Collapse()
         {
-            Debug.WriteLine("Collapse");
-            IsExpanded = IsExpanded ? false : true;
-            Debug.WriteLine($"IsExpanded: {IsExpanded}");
+            IsExpanded = !IsExpanded;
         }
 
         [RelayCommand]
-        private static void ValidateFile(ContextFile file) 
+        private void ValidateFile(ContextFile file)
         {
-            file.ValidationDate = DateTime.Now;
-            file.ValidationStatus = ValidationStatus.Validated;
-            file.IsValidated = true;
+            file.Validate();
+
+            _ = SyncronizationWithJsonReport();
         }
 
         [RelayCommand]
-        private static void RejectFile(ContextFile file)
+        private void RejectFile(ContextFile file)
         {
-            file.ValidationDate = DateTime.Now;
-            file.ValidationStatus = ValidationStatus.Rejected;
-            file.IsValidated = false;
+            file.Reject();
+
+
+            _ = SyncronizationWithJsonReport();
         }
     }
 }

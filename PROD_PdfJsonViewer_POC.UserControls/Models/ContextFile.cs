@@ -42,5 +42,19 @@ namespace PROD_PdfJsonViewer_POC.UserControls.Models
         {
             FileName = System.IO.Path.GetFileName(value);
         }
+
+        public void Validate()
+        {
+            IsValidated = true;
+            ValidationDate = DateTime.Now;
+            ValidationStatus = ValidationStatus.Validated;
+        }
+
+        public void Reject()
+        {
+            IsValidated = false;
+            ValidationDate = null;
+            ValidationStatus = ValidationStatus.Rejected;
+        }
     }
 }

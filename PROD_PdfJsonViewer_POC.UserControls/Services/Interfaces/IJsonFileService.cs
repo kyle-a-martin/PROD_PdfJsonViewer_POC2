@@ -12,6 +12,8 @@ namespace PROD_PdfJsonViewer_POC.UserControls.Services.Interfaces
         /// <returns>A JsonNode representing the JSON content (or null if empty).</returns>
         Task<JsonNode?> LoadJsonAsync(string filePath, CancellationToken cancellationToken = default);
 
+        Task<T?> LoadJsonAsync<T>(string filePath, CancellationToken cancellationToken = default) where T : class;
+
         /// <summary>
         /// Saves JSON content to the file asynchronously.
         /// </summary>
@@ -19,5 +21,9 @@ namespace PROD_PdfJsonViewer_POC.UserControls.Services.Interfaces
         /// <param name="json">The JSON content to save.</param>
         /// <param name="cancellationToken">Optional cancellation token.</param>
         Task SaveJsonAsync(string filePath, JsonNode json, CancellationToken cancellationToken = default);
+
+        Task SaveJsonAsync(string filePath, string json, CancellationToken cancellationToken = default);
+
+        Task SaveJsonAsync(string filePath, object json, CancellationToken cancellationToken = default);
     }
 }
