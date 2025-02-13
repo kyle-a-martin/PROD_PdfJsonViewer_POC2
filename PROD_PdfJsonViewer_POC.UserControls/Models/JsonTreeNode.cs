@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace PROD_PdfJsonViewer_POC.UI.Model
+namespace PROD_PdfJsonViewer_POC.UserControls.Models
 {
     public class JsonTreeNode
     {

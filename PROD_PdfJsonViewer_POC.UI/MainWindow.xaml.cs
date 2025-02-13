@@ -1,4 +1,6 @@
-﻿using PROD_PdfJsonViewer_POC.UI.ViewModel;
+﻿using Microsoft.Extensions.DependencyInjection;
+using PROD_PdfJsonViewer_POC.UI.ViewModel;
+using PROD_PdfJsonViewer_POC.UserControls.ViewModels;
 using System.ComponentModel;
 using System.Windows;
 
@@ -14,19 +16,8 @@ namespace PROD_PdfJsonViewer_POC.UI
             //var jsonEditorVm = ((App)Application.Current).ServiceProvider?.GetRequiredService<JsonEditorViewModel>();
             //JsonEditor.DataContext = jsonEditorVm;
 
-            // Subscribe to property changes in the view model.
-            viewModel.PropertyChanged += ViewModel_PropertyChanged;
-        }
-
-        private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            // When the PdfSource property changes, navigate the WebBrowser.
-            if (e.PropertyName == nameof(MainWindowViewModel.PdfSource)
-                && DataContext is MainWindowViewModel vm
-                && vm.PdfSource != null)
-            {
-                PdfViewer.Navigate(vm.PdfSource);
-            }
+            var validationPanelVm = ((App)Application.Current).AppHost.Services.GetRequiredService<ValidationPanelViewModel>();
+            ValidationPanel.SetViewModel(validationPanelVm);
         }
     }
 }

@@ -12,9 +12,9 @@ namespace PROD_PdfJsonViewer_POC.UserControls.Converters
             {
                 return true;
             }
-            else if (value is JsonValueKind.False) 
-            { 
-                return false; 
+            else if (value is JsonValueKind.False)
+            {
+                return false;
             }
             return null;
         }
