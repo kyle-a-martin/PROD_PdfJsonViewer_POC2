@@ -302,7 +302,7 @@
                                     </Setter>
                                     <Style.Triggers>
                                         <Trigger Property="IsChecked" Value="True">
-                                            <Setter Property="ContentTemplate" Value="{StaticResource BranchIconTemplate}" />
+                                            <Setter Property="ContentTemplate" Value="{StaticResource ExpandedIconTemplate}" />
                                         </Trigger>
                                         <Trigger Property="IsChecked" Value="False">
                                             <Setter Property="ContentTemplate" Value="{StaticResource CollapsedIconTemplate}" />

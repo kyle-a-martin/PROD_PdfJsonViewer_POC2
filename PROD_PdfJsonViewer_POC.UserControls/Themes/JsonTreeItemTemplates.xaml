@@ -25,7 +25,7 @@
             </Grid.ColumnDefinitions>
 
             <Border Background="Transparent" BorderThickness="0" Padding="2" Margin="0">
-                <TextBlock Text="{Binding Key, StringFormat={}{0}(Branch):}" FontWeight="Bold" VerticalAlignment="Center" Margin ="10,7,2,2" FontSize="14"/>
+                <TextBlock Text="{Binding Key, StringFormat={}{0}:}" FontWeight="Bold" VerticalAlignment="Center" Margin ="10,5,2,2" FontSize="14"/>
             </Border>
             
             <ItemsPresenter Grid.Column="1" Margin="0,0,0,0" />
@@ -41,9 +41,10 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock Text="{Binding Key, StringFormat={}{0}(String):}" FontWeight="Bold" VerticalAlignment="Top" Margin="10,12,2,2" FontSize="14" />
+            <TextBlock Text="{Binding Key, StringFormat={}{0}:}" FontWeight="Bold" VerticalAlignment="Center" Margin="10,5,2,2" FontSize="14" />
             <TextBox Grid.Column="1" Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                     Margin="5" 
+                     Margin="0" 
+                     VerticalAlignment="Center"
                      Style="{DynamicResource EditorTextBox}"
                      IsReadOnly="{Binding DataContext.IsEditable, Converter={StaticResource InverseBooleanConverter}, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
         </Grid>
@@ -56,7 +57,7 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock Text="{Binding Key, StringFormat={}{0}(DateTime):}" FontWeight="Bold" VerticalAlignment="Center" Margin="10,2,2,2" />
+            <TextBlock Text="{Binding Key, StringFormat={}{0}:}" FontWeight="Bold" VerticalAlignment="Center" Margin="10,2,2,2" />
             <DatePicker Grid.Column="1" 
                         SelectedDate="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                         Margin="2" />
@@ -70,7 +71,7 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock Text="{Binding Key, StringFormat={}{0}(Boolean):}" FontWeight="Bold" VerticalAlignment="Center" Margin="10,2,2,2" Style="{StaticResource StyledTextBlock}"/>
+            <TextBlock Text="{Binding Key, StringFormat={}{0}:}" FontWeight="Bold" VerticalAlignment="Center" Margin="10,2,2,2" Style="{StaticResource StyledTextBlock}"/>
             <ToggleButton Grid.Column="1" 
                           IsChecked="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource JsonBooleanConverter}}" 
                           Content="{Binding Value, Converter={StaticResource JsonBooleanToStringConverter}}" 
@@ -86,7 +87,7 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock Text="{Binding Key, StringFormat={}{0}(Default):}" FontWeight="Bold" VerticalAlignment="Center" Margin="10,2,2,2" />
+            <TextBlock Text="{Binding Key, StringFormat={}{0}:}" FontWeight="Bold" VerticalAlignment="Center" Margin="10,2,2,2" />
             <TextBlock Grid.Column="1" 
                        Text="{Binding Value}" 
                        VerticalAlignment="Top" 
@@ -94,12 +95,37 @@
         </Grid>
     </DataTemplate>
 
+    <!-- Empty Template -->
+    <DataTemplate x:Key="EmptyObjectTemplate">
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="{Binding Key}" FontWeight="Bold" FontSize="14" Margin="10,5,2,2"/>
+            <TextBlock Text=": {}" FontSize="14" Margin="10,5,2,2"/>
+        </StackPanel>
+    </DataTemplate>
+
+    <DataTemplate x:Key="EmptyArrayTemplate">
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="{Binding Key}" FontWeight="Bold" FontSize="14" Margin="10,5,2,2"/>
+            <TextBlock Text=": []" FontSize="14" Margin="10,5,2,2"/>
+        </StackPanel>
+    </DataTemplate>
+
+    <DataTemplate x:Key="NullTemplate">
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="{Binding Key}" FontWeight="Bold" FontSize="14" Margin="10,5,2,2"/>
+            <TextBlock Text=": null" FontSize="14" Margin="10,5,2,2"/>
+        </StackPanel>
+    </DataTemplate>
+
     <helper:JsonTreeItemTemplateSelector x:Key="JsonTreeItemTemplateSelector"
                                      BranchTemplate="{StaticResource BranchTemplate}"
                                      StringTemplate="{StaticResource StringTemplate}"
                                      DateTimeTemplate="{StaticResource DateTimeTemplate}"
                                      BooleanTemplate="{StaticResource BooleanTemplate}"
-                                     DefaultTemplate="{StaticResource DefaultTemplate}" />
+                                     DefaultTemplate="{StaticResource DefaultTemplate}"
+                                     EmptyObjectTemplate="{StaticResource EmptyObjectTemplate}"
+                                     EmptyArrayTemplate="{StaticResource EmptyArrayTemplate}"
+                                     NullTemplate="{StaticResource NullTemplate}"/>
 
 
     <!-- JSON Editor Item Template -->

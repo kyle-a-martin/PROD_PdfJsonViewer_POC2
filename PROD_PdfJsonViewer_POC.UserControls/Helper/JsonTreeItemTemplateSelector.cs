@@ -13,14 +13,31 @@ namespace PROD_PdfJsonViewer_POC.UserControls.Helper
         public DataTemplate DateTimeTemplate { get; set; }
         public DataTemplate BooleanTemplate { get; set; }
         public DataTemplate DefaultTemplate { get; set; }
+        public DataTemplate EmptyObjectTemplate { get; set; }
+        public DataTemplate EmptyArrayTemplate { get; set; }
+        public DataTemplate NullTemplate { get; set; }
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
             if (item is JsonTreeItem jsonTreeItem)
             {
-                if (jsonTreeItem.HasChildren)
+                if (jsonTreeItem.Children.Count > 0)
                 {
                     return BranchTemplate;
+                }
+                else if (jsonTreeItem.Value is string strValue)
+                {
+                    switch (strValue)
+                    {
+                        case "{}":
+                            return EmptyObjectTemplate;
+                        case "[]":
+                            return EmptyArrayTemplate;
+                        case "null":
+                            return NullTemplate;
+                        default:
+                            return StringTemplate;
+                    }
                 }
                 else
                 {
@@ -32,7 +49,7 @@ namespace PROD_PdfJsonViewer_POC.UserControls.Helper
                             case JsonValueKind.String:
                                 return StringTemplate;
                             case JsonValueKind.Number:
-                                if (jsonValue.TryGetValue(out DateTime dateTime))
+                                if (jsonValue.TryGetValue(out DateTime _))
                                 {
                                     return DateTimeTemplate;
                                 }

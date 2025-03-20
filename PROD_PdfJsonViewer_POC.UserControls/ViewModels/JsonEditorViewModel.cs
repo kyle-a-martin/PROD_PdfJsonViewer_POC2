@@ -76,8 +76,9 @@ namespace PROD_PdfJsonViewer_POC.UserControls.ViewModels
                 if (json is not null)
                 {
                     JsonContent = json;
+                    var filename = Path.GetFileName(FilePath);
                     // Generate the tree items from the JSON node.
-                    JsonTreeItems = GenerateTreeItems(json);
+                    JsonTreeItems = GenerateTreeItems(json, rootKey: filename);
                 }
             }
             catch (Exception ex)
@@ -126,55 +127,48 @@ namespace PROD_PdfJsonViewer_POC.UserControls.ViewModels
         /// <summary>
         /// Recursively converts a JsonNode into a tree of JsonTreeItem objects.
         /// </summary>
-        private static ObservableCollection<JsonTreeItem> GenerateTreeItems(JsonNode? node, string key = "")
+        private static ObservableCollection<JsonTreeItem> GenerateTreeItems(JsonNode? node, string key = "", string rootKey = "")
         {
             var items = new ObservableCollection<JsonTreeItem>();
             if (node is JsonObject obj)
             {
-                foreach (var property in obj)
+                var item = new JsonTreeItem { Key = string.IsNullOrEmpty(key) ? rootKey : key, Value = obj.Count == 0 ? "{}" : null };
+                if (obj.Count > 0)
                 {
-                    var item = new JsonTreeItem { Key = property.Key };
-                    var childItems = GenerateTreeItems(property.Value, property.Key);
-                    if (childItems.Count > 1)
+                    foreach (var property in obj)
                     {
+                        var childItems = GenerateTreeItems(property.Value, property.Key);
                         foreach (var child in childItems)
                         {
                             item.Children.Add(child);
                         }
                     }
-                    else
-                    {
-                        item.Value = property.Value as JsonValue;
-                    }
-                    items.Add(item);
                 }
+                items.Add(item);
             }
             else if (node is JsonArray arr)
             {
-                int index = 0;
-                foreach (var element in arr)
+                var item = new JsonTreeItem { Key = key, Value = arr.Count == 0 ? "[]" : null };
+                if (arr.Count > 0)
                 {
-                    var item = new JsonTreeItem { Key = $"[{index}]" };
-                    var childItems = GenerateTreeItems(element, index.ToString());
-                    if (childItems.Count > 1)
+                    for (int i = 0; i < arr.Count; i++)
                     {
+                        var childItems = GenerateTreeItems(arr[i], $"[{i}]");
                         foreach (var child in childItems)
                         {
                             item.Children.Add(child);
                         }
                     }
-                    else
-                    {
-                        item.Value = element as JsonValue;
-                    }
-                    items.Add(item);
-                    index++;
                 }
+                items.Add(item);
             }
             else if (node is JsonValue value)
             {
-                // Leaf node.
-                items.Add(new JsonTreeItem { Key = key, Value = value });
+                items.Add(new JsonTreeItem { Key = key, Value = value.ToString() });
+            }
+            else if (node == null)
+            {
+                items.Add(new JsonTreeItem { Key = key, Value = "null" });
             }
             return items;
         }
