@@ -39,7 +39,7 @@
                 <TextBlock Text="{Binding FilePath, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource FilePathToFileNameConverter}}"
                           Style="{StaticResource StyledTextBlock}"/>
             </StackPanel>
-            --><!--<StackPanel Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Stretch">
+            <StackPanel Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Stretch">
                 <TextBlock Text="Loading..." 
                             Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" 
                             VerticalAlignment="Center" Margin="10,0,0,0"/>
@@ -49,10 +49,10 @@
                 <Button Style="{StaticResource FolderOpenButtonStyle}" Command="{Binding LoadCommand}" />
                 <Button Style="{StaticResource SaveButtonStyle}" Command="{Binding SaveCommand}" />
                 
-                --><!--<CheckBox Content="Editable" IsChecked="{Binding IsEditable, Mode=TwoWay}" Margin="10,0,0,0"/>--><!--
+                <CheckBox Content="Editable" IsChecked="{Binding IsEditable, Mode=TwoWay}" Margin="10,0,0,0"/>
                 <ToggleButton Content="Editable" IsChecked="{Binding IsEditable, Mode=TwoWay}" Style="{StaticResource ModernToggleButton}" Tag="&#xf204;"/>
 
-            </StackPanel>--><!--
+            </StackPanel>
         </DockPanel>-->
         
         <!-- Middle panel: JSON TreeView within a ScrollViewer -->
