@@ -22,7 +22,7 @@
             <ToolBarPanel VerticalAlignment="Top" Orientation="Horizontal" Width="Auto">
                 <Button x:Name="OpenFileButton" Style="{StaticResource FolderOpenButtonStyle}" Padding="5 0"  
                         Height="30"  Command="{Binding OpenPdfFileCommand}" />
-                <TextBlock x:Name="FolderPath" Text="{Binding FolderPath}" Style="{StaticResource CenteredTextBlock}" MinWidth="200"/>
+                <TextBlock x:Name="FolderPath" Text="{Binding FolderPath}" Style="{StaticResource CenteredTextBlock}" MinWidth="250"/>
                 <ComboBox x:Name="PdfFilesComboBox" ItemsSource="{Binding PdfFiles}" SelectedItem="{Binding SelectedPdfFile}" MinWidth="250">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
@@ -60,14 +60,14 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <jsoncontrols:ValidationPanelControl IsExpanded="{Binding DataContext.ValidationIsExpanded, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=Window}}" 
+            <!--<jsoncontrols:ValidationPanelControl IsExpanded="{Binding DataContext.ValidationIsExpanded, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=Window}}" 
                                                      IsPinned="{Binding DataContext.ValidationIsPinned, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=Window}}"
                                                      Files="{Binding DataContext.PdfFiles, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=Window}}"
                                                      SelectedFile="{Binding DataContext.SelectedPdfFile, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=Window}}"
                                                      x:Name="ValidationPanel" 
                                                      Margin="5,5,5,5" 
                                                      Background="White"
-                                                     Grid.Column="0" />
+                                                     Grid.Column="0" />-->
             <GridSplitter Grid.Column="1" 
                           Grid.Row="0"
                           Width="5" 

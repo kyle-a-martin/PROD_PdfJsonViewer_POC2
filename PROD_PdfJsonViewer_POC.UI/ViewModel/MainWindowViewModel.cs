@@ -124,7 +124,7 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
             
         }
 
-        private string GetRelatedJsonFile(string pdfFile)
+        private static string GetRelatedJsonFile(string pdfFile)
         {
             // Assume the related JSON file has the same name as the PDF file, but with a .json extension.
             string jsonFile = Path.ChangeExtension(pdfFile, ".json");

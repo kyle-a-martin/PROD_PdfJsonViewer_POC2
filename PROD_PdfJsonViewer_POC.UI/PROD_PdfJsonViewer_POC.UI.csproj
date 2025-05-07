@@ -8,6 +8,15 @@
     <UseWPF>true</UseWPF>
     <PackageIcon>Icon_DarkBlue.png</PackageIcon>
     <ApplicationIcon>Icon_DarkBlue.ico</ApplicationIcon>
+
+    <!-- Single file publishing settings -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <DebugType>embedded</DebugType>
+    <PublishReadyToRun>true</PublishReadyToRun>
   </PropertyGroup>
 
   <ItemGroup>
