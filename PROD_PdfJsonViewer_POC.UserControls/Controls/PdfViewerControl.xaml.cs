@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PROD_PdfJsonViewer_POC.UserControls.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -32,18 +33,38 @@ namespace PROD_PdfJsonViewer_POC.UserControls.Controls
         public PdfViewerControl()
         {
             InitializeComponent();
+
+        }
+
+        public PdfViewerControl(PdfViewerViewModel viewModel)
+        {
+            InitializeComponent();
+            DataContext = viewModel;
+            Loaded += PdfViewer_Loaded;
+        }
+
+        public void SetViewModel(PdfViewerViewModel viewModel)
+        {
+            DataContext = viewModel;
+            Loaded += PdfViewer_Loaded;
+        }
+
+        private async void PdfViewer_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is PdfViewerViewModel viewModel)
+            {
+                await viewModel.InitializeWebView2Async(webView);
+            }
         }
 
         static void OnFilePathChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var control = d as PdfViewerControl;
-
-            if (control != null)
+            if (d is PdfViewerControl pdfViewer &&
+                pdfViewer.DataContext is PdfViewerViewModel viewModel)
             {
-                control.Dispatcher.InvokeAsync(() => control.PdfViewer.Navigate(e.NewValue as string ?? string.Empty));
-                //Task.Run( () =>  control.PdfViewer.Navigate(e.NewValue as string ?? string.Empty));
+                viewModel.FilePath = (string)e.NewValue;
             }
-            
+
         }
     }
 }
