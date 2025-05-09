@@ -35,15 +35,19 @@ namespace PROD_PdfJsonViewer_POC.UI
             await AppHost.StartAsync();
         }
 
-        private void ConfigureServices(IServiceCollection services)
+        private static void ConfigureServices(IServiceCollection services)
         {
             // Register application services
             services.AddSingleton<IJsonFileService, JsonFileService>();
             services.AddSingleton<ILogger<ValidationPanelViewModel>, Logger<ValidationPanelViewModel>>();
+            services.AddSingleton<IPdfViewerService, PdfViewerService>();
+
 
             // Register ViewModels
             services.AddSingleton<ValidationPanelViewModel>();
+            services.AddSingleton<JsonEditorViewModel>();
             services.AddTransient<MainWindowViewModel>();
+            services.AddSingleton<PdfViewerViewModel>();
 
             // Register Views
             services.AddTransient<MainWindow>();
