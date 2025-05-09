@@ -89,7 +89,13 @@
 
                 <!-- PDF Viewer on the left -->
                 <!--<WebBrowser x:Name="PdfViewer" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5" />-->
-                <jsoncontrols:PdfViewerControl x:Name="PdfViewer" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5" FilePath="{Binding DataContext.SelectedPdfFile.FilePath, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                <jsoncontrols:PdfViewerControl x:Name="PdfViewer" 
+                               Grid.Column="0" 
+                               Grid.Row="0" 
+                               HorizontalAlignment="Stretch" 
+                               VerticalAlignment="Stretch" 
+                               Margin="5,5,5,5" 
+                               FilePath="{Binding DataContext.SelectedPdfFile.FilePath, RelativeSource={RelativeSource AncestorType=Window}}"/>
                 
                 <!-- Grid Splitter -->
                 <GridSplitter HorizontalAlignment="Stretch" 
