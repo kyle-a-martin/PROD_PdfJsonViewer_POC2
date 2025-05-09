@@ -17,6 +17,7 @@
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
     <DebugType>embedded</DebugType>
     <PublishReadyToRun>true</PublishReadyToRun>
+    <AssemblyName>DataBank.JsonValidator</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
