@@ -160,7 +160,8 @@ namespace PROD_PdfJsonViewer_POC.UI.ViewModel
         
         partial void OnSelectedPdfFileChanged(ContextFile value)
         {
-            Debug.WriteLine($"SelectedPdfFileChanged (MainWindowViewModel) - File: {value.FilePath}");
+            if (value != null)
+                Debug.WriteLine($"SelectedPdfFileChanged (MainWindowViewModel) - File: {value.FilePath}");
             
             //TODO: Create Event handler for when the SelectedPdfFile property changes.
             LoadPdfToViewer();

@@ -59,6 +59,9 @@ namespace PROD_PdfJsonViewer_POC.UserControls.ViewModels
                 _currentDirectory = Path.GetDirectoryName(newValue.FilePath) ?? string.Empty;
                 Task.Run(async () => await SyncronizationWithJsonReport());
             }
+
+            // invoke property changed event
+            OnPropertyChanged(nameof(SelectedFile));
         }
 
         partial void OnIsExpandedChanged(bool oldValue, bool newValue)

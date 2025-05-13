@@ -8,6 +8,7 @@
         xmlns:helper="clr-namespace:PROD_PdfJsonViewer_POC.UI.Helper"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         xmlns:vm="clr-namespace:PROD_PdfJsonViewer_POC.UI.ViewModel"
+        xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         xmlns:jsoncontrols="clr-namespace:PROD_PdfJsonViewer_POC.UserControls.Controls;assembly=PROD_PdfJsonViewer_POC.UserControls"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel, IsDesignTimeCreatable=True}"
@@ -16,24 +17,32 @@
         <helper:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
         <helper:PathToFilenameConverter x:Key="PathToFilenameConverter" />
         <helper:FilePathToFileNameConverter x:Key="FilePathToFileNameConverter" />
+
+        <CollectionViewSource x:Key="SortedPdfFilesSource" Source="{Binding PdfFiles}">
+            <CollectionViewSource.SortDescriptions>
+                <scm:SortDescription PropertyName="FilePath" Direction="Ascending"/>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
     </Window.Resources>
     <DockPanel Background="LightGray">
         <ToolBar DockPanel.Dock="Top" VerticalAlignment="Top" Padding="0, 5, 0, 5">
             <ToolBarPanel VerticalAlignment="Top" Orientation="Horizontal" Width="Auto">
-                <Button x:Name="OpenFileButton" Style="{StaticResource FolderOpenButtonStyle}" Padding="5 0"  
-                        Height="30"  Command="{Binding OpenPdfFileCommand}" />
-                <TextBlock x:Name="FolderPath" Text="{Binding FolderPath}" Style="{StaticResource CenteredTextBlock}" MinWidth="250"/>
-                <ComboBox x:Name="PdfFilesComboBox" ItemsSource="{Binding PdfFiles}" SelectedItem="{Binding SelectedPdfFile}" MinWidth="250">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding FilePath, Converter={StaticResource FilePathToFileNameConverter}}" Style="{StaticResource CenteredComboBoxTextBlock}" />
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-                <Button x:Name="PreviousButton" Style="{StaticResource PrevButtonStyle}"  Height="30"  
-                        Command="{Binding PreviousPdfCommand}" Margin="10 0"/>
-                <Button x:Name="NextButton"  Style="{StaticResource NextButtonStyle}"  Height="30"  
-                        Command="{Binding NextPdfCommand}" Margin="10 0"/>
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="OpenFileButton" Style="{StaticResource FolderOpenButtonStyle}" Padding="5 0"  
+                            Height="30"  Command="{Binding OpenPdfFileCommand}" Visibility="Visible" />
+                    <TextBlock x:Name="FolderPath" Text="{Binding FolderPath}" Style="{StaticResource CenteredTextBlock}" MinWidth="250" MaxWidth="500"/>
+                    <ComboBox x:Name="PdfFilesComboBox" ItemsSource="{Binding Source={StaticResource SortedPdfFilesSource}}"  SelectedItem="{Binding SelectedPdfFile}" MinWidth="250">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding FilePath, Converter={StaticResource FilePathToFileNameConverter}}" Style="{StaticResource CenteredComboBoxTextBlock}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <Button x:Name="PreviousButton" Style="{StaticResource PrevButtonStyle}"  Height="30"  
+                            Command="{Binding PreviousPdfCommand}" Margin="10 0"/>
+                    <Button x:Name="NextButton"  Style="{StaticResource NextButtonStyle}"  Height="30"  
+                            Command="{Binding NextPdfCommand}" Margin="10 0"/>
+                </StackPanel>
             </ToolBarPanel>
         </ToolBar>
         <!--<DockPanel >
@@ -76,6 +85,7 @@
                           RenderOptions.BitmapScalingMode="HighQuality"
                           SnapsToDevicePixels="True"
                           IsTabStop="False"
+                          IsEnabled="True"
                           ResizeBehavior="PreviousAndNext"
                           />
             <Grid Grid.Column="2">
@@ -105,7 +115,7 @@
                               Width="5"
                               RenderOptions.BitmapScalingMode="HighQuality"
                               SnapsToDevicePixels="True"
-                              IsEnabled="False"
+                              IsEnabled="True"
                               ResizeBehavior="PreviousAndNext"/>
                 
                 <!-- JSON Editor control on the right -->
