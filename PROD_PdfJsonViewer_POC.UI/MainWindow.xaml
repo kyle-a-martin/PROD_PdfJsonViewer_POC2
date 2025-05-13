@@ -61,13 +61,14 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <jsoncontrols:ValidationPanelControl IsExpanded="{Binding DataContext.ValidationIsExpanded, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                                     IsPinned="{Binding DataContext.ValidationIsPinned, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                     Files="{Binding DataContext.PdfFiles, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                     SelectedFile="{Binding DataContext.SelectedPdfFile, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                     x:Name="ValidationPanel" 
-                                                     Margin="5,5,5,5" 
-                                                     Background="White"
-                                                     Grid.Column="0" />
+                                         IsPinned="{Binding DataContext.ValidationIsPinned, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=Window}}"
+                                         Files="{Binding DataContext.PdfFiles, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=Window}}"
+                                         SelectedFile="{Binding DataContext.SelectedPdfFile, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=Window}}"
+                                         x:Name="ValidationPanel" 
+                                         Margin="5,5,5,5" 
+                                         Background="White"
+                                         Grid.Column="0" 
+                                         />
             <GridSplitter Grid.Column="1" 
                           Grid.Row="0"
                           Width="5" 
