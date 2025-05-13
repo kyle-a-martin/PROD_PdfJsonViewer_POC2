@@ -3,6 +3,7 @@ using PROD_PdfJsonViewer_POC.UserControls.Models;
 using PROD_PdfJsonViewer_POC.UserControls.Services.Implementations;
 using PROD_PdfJsonViewer_POC.UserControls.ViewModels;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,6 +24,12 @@ namespace PROD_PdfJsonViewer_POC.UserControls.Controls
         public void SetViewModel(ValidationPanelViewModel viewModel)
         {
             DataContext = viewModel;
+
+            viewModel.PropertyChanged += ViewModel_PropertyChanged;
+
+            // Initialize the ViewModel with current values from dependency properties
+            viewModel.Files = Files;
+            viewModel.SelectedFile = SelectedFile;
         }
 
         #region Dependency Properties
@@ -73,8 +80,8 @@ namespace PROD_PdfJsonViewer_POC.UserControls.Controls
 
         public ContextFile SelectedFile
         {
-            get { return (ContextFile)GetValue(SelectedFileProperty); }
-            set { SetValue(SelectedFileProperty, value); }
+            get => (ContextFile)GetValue(SelectedFileProperty); 
+            set => SetValue(SelectedFileProperty, value); 
         }
 
         #endregion
@@ -83,13 +90,16 @@ namespace PROD_PdfJsonViewer_POC.UserControls.Controls
 
         private static void OnSelectedFileChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            Debug.WriteLine("OnSelectedFileChanged");
-            Debug.WriteLine(e.NewValue);
-            
-            // TODO: Update the view model Selected File property when the SelectedFile property changes.
-            if (d is ValidationPanelControl control && control.DataContext is ValidationPanelViewModel vm)
+            var control = (ValidationPanelControl)d;
+
+            // When the dependency property changes from outside, update the ViewModel
+            if (control.DataContext is ValidationPanelViewModel vm)
             {
-                vm.SelectedFile = e.NewValue as ContextFile ?? new ContextFile();
+                // Prevent circular updates by checking if the values are already in sync
+                if (!ReferenceEquals(vm.SelectedFile, e.NewValue))
+                {
+                    vm.SelectedFile = e.NewValue as ContextFile;
+                }
             }
         }
 
@@ -104,6 +114,21 @@ namespace PROD_PdfJsonViewer_POC.UserControls.Controls
             }
         }
 
+        private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            var vm = (ValidationPanelViewModel)sender;
+
+            // When ViewModel's SelectedFile changes, update the dependency property
+            if (e.PropertyName == nameof(ValidationPanelViewModel.SelectedFile))
+            {
+                // Prevent circular updates by checking if the values are already in sync
+                if (!ReferenceEquals(SelectedFile, vm.SelectedFile))
+                {
+                    SelectedFile = vm.SelectedFile;
+                }
+            }
+        }
         #endregion
+
     }
 }

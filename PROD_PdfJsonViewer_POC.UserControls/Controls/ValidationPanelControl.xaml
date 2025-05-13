@@ -7,6 +7,7 @@
              xmlns:converters="clr-namespace:PROD_PdfJsonViewer_POC.UserControls.Converters"
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              xmlns:faWPF="clr-namespace:FontAwesome.WPF;assembly=FontAwesome.WPF" 
+             xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              xmlns:viewmodels="clr-namespace:PROD_PdfJsonViewer_POC.UserControls.ViewModels" 
              d:DataContext="{d:DesignInstance Type=viewmodels:ValidationPanelViewModel}"
              mc:Ignorable="d" 
@@ -15,7 +16,13 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <converters:BooleanToColorConverter x:Key="BooleanToColorConverter" />
         <converters:ValidationStatusConverter x:Key="ValidationStatusConverter" />
-        
+
+        <CollectionViewSource x:Key="SortedFilesSource" Source="{Binding Files}">
+            <CollectionViewSource.SortDescriptions>
+                <scm:SortDescription PropertyName="FilePath" Direction="Ascending"/>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+
         <!-- Modern Button Style -->
         <Style x:Key="ModernButtonStyle" TargetType="Button"> 
             <Setter Property="Background" Value="Transparent"/>
@@ -153,6 +160,7 @@
             BorderThickness="1"
             CornerRadius="4"
             Margin="0,0,4,4"
+            
             Visibility="{Binding IsExpanded, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Inverse}">
             <Grid>
                 <Grid.RowDefinitions>
@@ -176,12 +184,13 @@
                                   VerticalAlignment="Center"
                                   Foreground="#1976d2"/>
 
-                    <TextBlock Text="File Validator" 
+                    <TextBlock Text="File Validator"
                              Grid.Column="1"
                              Margin="8,0"
                              VerticalAlignment="Center"
                              FontWeight="SemiBold"
                              Foreground="#2c3e50"/>
+                    
 
                     <ToggleButton Grid.Column="2"
                                 Style="{StaticResource ModernToggleButtonStyle}"
@@ -247,7 +256,7 @@
 
                 <!-- File List -->
                 <ListView Grid.Row="2"
-                          ItemsSource="{Binding Files, Mode=TwoWay}"
+                          ItemsSource="{Binding Source={StaticResource SortedFilesSource}}"
                           SelectedItem="{Binding SelectedFile, Mode=TwoWay}"
                           BorderThickness="0"
                           ItemContainerStyle="{StaticResource ModernListViewItem}"
@@ -276,7 +285,7 @@
                                                 VerticalAlignment="Center"
                                                 HorizontalAlignment="Stretch"
                                                 TextTrimming="CharacterEllipsis"
-                                                MaxWidth="100" />
+                                                MinWidth="120" />
 
                                     <!-- Status Display -->
                                     <Grid Margin="0,4,0,0">
