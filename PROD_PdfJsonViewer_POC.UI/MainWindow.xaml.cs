@@ -20,7 +20,7 @@ namespace PROD_PdfJsonViewer_POC.UI
             //JsonEditor.DataContext = jsonEditorVm;
 
             var validationPanelVm = ((App)Application.Current).AppHost.Services.GetRequiredService<ValidationPanelViewModel>();
-            //ValidationPanel.SetViewModel(validationPanelVm);
+            ValidationPanel.SetViewModel(validationPanelVm);
 
             var pdfViewerVm = ((App)Application.Current).AppHost.Services.GetRequiredService<PdfViewerViewModel>();
             PdfViewer.SetViewModel(pdfViewerVm);
